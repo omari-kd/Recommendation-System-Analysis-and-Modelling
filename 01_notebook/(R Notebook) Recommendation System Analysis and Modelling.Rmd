@@ -1,0 +1,294 @@
+---
+title: "Recommendation System Analysis and Modelling"
+author: "Omari Ebenezer"
+output: html_notebook
+---
+
+------------------------------------------------------------------------
+
+> ::: {#overview style="text-align: justify"}
+> # **Introduction**
+>
+> Recommendation systems are essential for delivering personalised user experiences across a variety of platforms, including e-commerce, streaming services, social media and news websites.
+>
+> This project aims to develop a recommendation system that leveraged historical user data to provide tailored recommendations across different domains, such as product recommendations, content suggestions and service optimisation.
+>
+> ## **CRISP DM Framework**
+>
+> The analysis followed the CRISP-DM methodology, which includes the following stages:
+>
+> ### **1. Business Understanding:**
+>
+> The objectives were defined below, followed by the formulation of analytic questions to guide the modelling process.
+>
+> Key objectives of the project include:
+>
+> 1.Develop Personalized Recommendations: Tailor suggestions based on user behaviour and past interactions.
+>
+> 2.Address Diverse Use Cases: Implement systems for product, content and service recommendations.
+>
+> 3.Utilize Historical Data: Leverage past user actions to make accurate predictions.
+>
+> 4.Enhance User Engagement: Improve user satisfaction and retention through relevant suggestions.
+>
+> 5.Ensure Scalability & Real-Time Performance: Handle large data volumes and provide recommendations promptly.
+>
+> 6.Boost Business Metrics: Increase sales and conversion rates through better user personalization.
+>
+> 7.Balance Accuracy & Diversity: Provide relevant but varied recommendations to avoid monotony.
+>
+> \
+> Analytic Questions:**\
+> **
+>
+> ### **2. Data Understanding:**
+>
+> The dataset consists of three files: events.csv, item_properties.csv and category_tree.csv, which collectively describe the interactions and properties of items on an e-commerce website. The data, collected over a 4.5-month period, is raw and contains hashed values due to confidentiality concerns. The goal of publishing this dataset is to support research in recommender systems using implicit feedback.
+>
+> 2.1 Behavior Data (events.csv)
+>
+> The behavior data includes a total of 2,756,101 events, with 2,664,312 views, 69,332 add-to-cart actions, and 22,457 transactions, recorded from 1,407,580 unique visitors. Each event corresponds to one of three types of interactions: "view", "addtocart", or "transaction". These implicit feedback signals are crucial for recommender systems:
+>
+> View: Represents a user showing interest in an item.
+>
+> Add to Cart: Indicates a higher level of intent to purchase.
+>
+> Transaction: Represents a completed purchase.
+>
+> 2.2 Item Properties (item_properties.csv)
+>
+> This file contains 20,275,902 rows, representing various properties of 417,053 unique items. Each property may change over time (e.g., price updates), with each row capturing a snapshot of an item’s property at a specific timestamp. For items with constant properties, only a single snapshot is recorded. The file is split into two due to its size, and it contains detailed item information, which is essential for building item profiles and understanding how item properties influence user behavior.
+>
+> 2.3 Category Tree (category_tree.csv)
+>
+> The category_tree.csv file outlines the hierarchical structure of item categories. It provides a category-based organization of the products, which can help in grouping items into broader categories or subcategories. This file is important for building models that recommend items within specific categories or using category-based clustering for recommendations.
+> :::
+
+### **3. Data Preparation:**
+
+```{r}
+# Load libraries
+library(data.table)
+library(dplyr)
+library(tidyr)
+library(ggplot2)
+library(caret)
+library(janitor)
+```
+
+```{r}
+read_in_chunks <- function(file_path, chunk_size = 10000, ...) {
+  # Open the file connection for reading
+  con <- file(file_path, open = "r")
+  
+  # Read the header line (assumes CSV header is in the first line)
+  header <- readLines(con, n = 1)
+  
+  # Prepare an empty list to store chunks
+  chunks <- list()
+  chunk_index <- 1
+  
+  repeat {
+    # Read the next chunk_size lines
+    lines <- readLines(con, n = chunk_size)
+    
+    # Exit the loop if no more lines are available
+    if (length(lines) == 0) break
+    
+    # Combine header and the chunk's lines to form a valid CSV text
+    csv_text <- paste(c(header, lines), collapse = "\n")
+    
+    # Read the combined text into a data frame
+    chunk_df <- read.csv(text = csv_text, header = TRUE, stringsAsFactors = FALSE, ...)
+    
+    # Store the chunk in the list
+    chunks[[chunk_index]] <- chunk_df
+    chunk_index <- chunk_index + 1
+  }
+  
+  # Close the connection
+  close(con)
+  
+  return(chunks)
+}
+```
+
+```{r}
+# Read category tree.csv
+category_tree <- fread("./00_raw_data/category_tree.csv")
+```
+
+```{r}
+# Read events.csv in chunks
+events <- read_in_chunks("./00_raw_data/events.csv")
+```
+
+```{r}
+# Read item_properties_part1.1.csv in chunks
+item_properties_1 <- read_in_chunks("./00_raw_data/item_properties_part1.1.csv")
+```
+
+```{r}
+# Read item_properties_part2.csv in chunks
+item_properties_2 <- read_in_chunks("./00_raw_data/item_properties_part2.csv")
+```
+
+```{r}
+# Concatenate the two item_properties 
+# item_properites <- c(item_properties_1, item_properties_2)
+```
+
+```{r}
+# Bind events to data frame
+events <- rbindlist(events)
+```
+
+```{r}
+# Bind item properties 1 & 2 in a data frame
+item_properties <- do.call(rbind, c(item_properties_1, item_properties_2))
+```
+
+```{r}
+# Data cleaning for category_tree
+# Check for duplicates and clean column names
+sum(duplicated(category_tree))
+```
+
+```{r}
+# Check for NA's 
+colSums(is.na(category_tree) | category_tree == "")
+```
+
+```{r}
+# Check the data type of each variable
+str(category_tree)
+```
+
+```{r}
+# Data Cleaning for events 
+# Check for duplicates in events
+sum(duplicated(events))
+
+# Remove duplicates 
+events <- unique(events)
+
+# Verify
+sum(duplicated(events))
+```
+
+```{r}
+# Check for NA's in events
+colSums(is.na(events) | events == "")
+```
+
+```{r}
+# Check data type
+str(events)
+```
+
+```{r}
+# Convert to appropiate data types
+# events$visitorid <- as.character(events$visitorid)
+
+# events$itemid <- as.character(events$itemid)
+
+# Convert 'event' to factor
+events[, event := as.factor(event)]
+```
+
+```{r}
+# Check datatype or class of the variable timestamp
+class(events$timestamp)
+
+# Convert to POSIXct
+events$timestamp <- as.POSIXct(events$timestamp / 1000, origin = "1970-01-01", tz = "UTC")
+```
+
+```{r}
+# Data Cleaning for item properties
+# Check for duplicates in item_properties
+# sum(duplicated(item_properties))
+```
+
+```{r}
+# Check for NA's in item properties
+# colSums(is.na(item_properties) | item_properties == "")
+```
+
+```{r}
+# Convert to POSIXct
+item_properties$timestamp <- as.POSIXct(item_properties$timestamp / 1000, origin = "1970-01-01", tz = "UTC")
+```
+
+```{r}
+# Clean numeric values
+# Use string functions to remove the prefix and then convert them to numeric.
+# Some of the 'value' column sometimes starts with "n"
+
+# Check Class
+class(item_properties)
+
+# Set to data.table
+setDT(item_properties)
+
+# Apply the operation
+item_properties[, value_clean := as.numeric(gsub("^n", "", value))]
+
+# Round to 3 decimanls for precision
+# item_properties[, value_clean := round(value_clean, 3)]
+
+
+# Check conversion
+summary(item_properties$value_clean)
+```
+
+```{r}
+# For columns like property that are hashed, ensure that the same hash represents the same property across different rows.
+# Group by itemid and property to see if there are any inconsistencies.
+
+# Count distinct value entries for each combination of item and property
+# consistency_check <- item_properties[, .(unique_values = uniqueN(value_clean)), by = .(itemid, property)]
+
+# If a property is expected to be constant, unique_values should be 1.
+# summary(consistency_check$unique_values)
+
+```
+
+```{r}
+# Merging datasets
+# Perform a Rolling Join
+# A rolling join allows you to match each event with the most recent (previous) item property snapshot.
+
+# Set event to data.table
+setDT(events)
+
+# Order the data by itemid and timestamp
+setorder(events, itemid, timestamp)
+setorder(item_properties, itemid, timestamp)
+
+# Set keys for a rolling join
+setkey(events, itemid, timestamp)
+setkey(item_properties, itemid, timestamp)
+
+# Rolling join: for each event, get the most recent snapshot from item properties.
+# This matches on 'itemid' and finds the snapshot with a timestamp less than or equal to the event timestamp.
+merged_data <- item_properties[events, on = .(itemid, timestamp), roll = TRUE]
+
+# Inspect the merged result
+head(merged_data)
+
+# Both events and item_props are keyed by itemid and timestamp. This ensures the join is performed efficiently.
+
+# Rolling Join (roll = TRUE): When you join item_props with events, the roll = TRUE option tells data.table to find, for each event, the row in item_props with the closest timestamp that does not exceed the event's timestamp. This aligns each event with the proper snapshot of the item properties.
+```
+
+```{r}
+# Extending the join
+# Since there is a category_tree table merge it by joining on the relevant category identifier extracted from the item properties.
+
+# Set keys
+# setkey(category_tree, categoryid)
+
+# Join with the merged_data (adjust column names accordingly)
+# final_data <- merge(merged_data, category_tree, by.x = "categoryid", by.y = "categoryid", all.x = TRUE)
+```
