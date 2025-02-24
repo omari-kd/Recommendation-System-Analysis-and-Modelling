@@ -61,7 +61,7 @@ output: html_notebook
 >
 > 2.3 Category Tree (category_tree.csv)
 >
-> The category_tree.csv file outlines the hierarchical structure of item categories. It provides a category-based organization of the products, which can help in grouping items into broader categories or subcategories. This file is important for building models that recommend items within specific categories or using category-based clustering for recommendations.
+> The category_tree.csv file outlines the hierarchical structure of item categories. It provides a category-based organisation of the products, which can help in grouping items into broader categories or subcategories. This file is important for building models that recommend items within specific categories or using category-based clustering for recommendations.
 > :::
 
 ### **3. Data Preparation:**
@@ -283,12 +283,45 @@ head(merged_data)
 ```
 
 ```{r}
-# Extending the join
-# Since there is a category_tree table merge it by joining on the relevant category identifier extracted from the item properties.
+# Filter the item properties data to isolate the rows where the property is "categoryid". This gives you the actual category identifier for each item.
 
-# Set keys
-# setkey(category_tree, categoryid)
+category_property <- item_properties[property == "categoryid"]
 
-# Join with the merged_data (adjust column names accordingly)
-# final_data <- merge(merged_data, category_tree, by.x = "categoryid", by.y = "categoryid", all.x = TRUE)
+# Perform a rolling join Since item properties are time-dependent, align each event with the most recent "categoryid" snapshot preceding the event time
+
+# Order and set keys for rolling join
+setorder(category_property, itemid, timestamp)
+setorder(events, itemid, timestamp)
+setkey(category_property, itemid, timestamp)
+setkey(events, itemid, timestamp)
+
+
+# Rolling join: For each event, get the most recent "categoryid" snapshot
+events_with_category <- category_property[events, on = .(itemid, timestamp), roll = TRUE]
+
+# Rolling Join (roll = TRUE): When you join item_props with events, the roll = TRUE option tells data.table to find, for each event, the row in item_props with the closest timestamp that does not exceed the event's timestamp. This aligns each event with the proper snapshot of the item properties
 ```
+
+```{r}
+
+# Rename and Prepare the Category Identifier
+# For clarity, rename the column containing the category identifier. 
+events_with_category[, categoryid := value_clean]
+
+
+# Merge with category tree
+# setKey
+setkey(category_tree, categoryid)
+setkey(events_with_category, categoryid)
+
+
+# Merge the category tree with the events data
+final_data <- merge(events_with_category, category_tree, by = "categoryid", all.x = TRUE)
+
+
+# In the merge() function in R, the all.x = TRUE argument specifies that the merge should be left join (keeping all rows from the left dataset and only matching rows from the right dataset).
+```
+
+\
+
+\
