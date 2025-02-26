@@ -45,9 +45,9 @@ output: html_notebook
 >
 > The dataset consists of three files: events.csv, item_properties.csv and category_tree.csv, which collectively describe the interactions and properties of items on an e-commerce website. The data, collected over a 4.5-month period, is raw and contains hashed values due to confidentiality concerns. The goal of publishing this dataset is to support research in recommender systems using implicit feedback.
 >
-> 2.1 Behavior Data (events.csv)
+> 2.1 Behaviour Data (events.csv)
 >
-> The behavior data includes a total of 2,756,101 events, with 2,664,312 views, 69,332 add-to-cart actions, and 22,457 transactions, recorded from 1,407,580 unique visitors. Each event corresponds to one of three types of interactions: "view", "addtocart", or "transaction". These implicit feedback signals are crucial for recommender systems:
+> The behaviour data includes a total of 2,756,101 events, with 2,664,312 views, 69,332 add-to-cart actions, and 22,457 transactions, recorded from 1,407,580 unique visitors. Each event corresponds to one of three types of interactions: "view", "addtocart", or "transaction". These implicit feedback signals are crucial for recommender systems:
 >
 > View: Represents a user showing interest in an item.
 >
@@ -57,7 +57,7 @@ output: html_notebook
 >
 > 2.2 Item Properties (item_properties.csv)
 >
-> This file contains 20,275,902 rows, representing various properties of 417,053 unique items. Each property may change over time (e.g., price updates), with each row capturing a snapshot of an item’s property at a specific timestamp. For items with constant properties, only a single snapshot is recorded. The file is split into two due to its size, and it contains detailed item information, which is essential for building item profiles and understanding how item properties influence user behavior.
+> This file contains 20,275,902 rows, representing various properties of 417,053 unique items. Each property may change over time (e.g., price updates), with each row capturing a snapshot of an item’s property at a specific timestamp. For items with constant properties, only a single snapshot is recorded. The file is split into two due to its size, and it contains detailed item information, which is essential for building item profiles and understanding how item properties influence user behaviour.
 >
 > 2.3 Category Tree (category_tree.csv)
 >
@@ -77,6 +77,7 @@ library(janitor)
 ```
 
 ```{r}
+
 read_in_chunks <- function(file_path, chunk_size = 10000, ...) {
   # Open the file connection for reading
   con <- file(file_path, open = "r")
@@ -111,6 +112,7 @@ read_in_chunks <- function(file_path, chunk_size = 10000, ...) {
   
   return(chunks)
 }
+
 ```
 
 ```{r}
@@ -232,17 +234,51 @@ class(item_properties)
 setDT(item_properties)
 
 # Apply the operation
-item_properties[, value_clean := as.numeric(gsub("^n", "", value))]
+# item_properties[, value := trimws(value)]
+# item_properties[, value_clean := as.numeric(gsub("^n", "", value))]
+
+# item_properties[, value_clean := as.numeric(gsub("[^0-9.-]", "", gsub("^n", "", value)))]
+
+# item_properties[, value_clean := as.numeric(gsub("^n+", "", value))]
+
 
 # Round to 3 decimanls for precision
 # item_properties[, value_clean := round(value_clean, 3)]
 
+extract_numeric_value <- function(x) {
+  # Split the string by whitespace
+  tokens <- strsplit(x, " ")[[1]]
+  
+  # Find tokens that start with "n" (one or more)
+  n_tokens <- grep("^n+", tokens, value = TRUE)
+  
+  if (length(n_tokens) > 0) {
+    # If multiple tokens start with n, choose the first one (or apply your logic here)
+    # Remove the "n" prefix(s) and convert to numeric
+    return(as.numeric(gsub("^n+", "", n_tokens[1])))
+  } else {
+    # Optionally: if no token with "n" is found, you could decide to return NA or try to convert the first token
+    return(as.numeric(tokens[1]))
+  }
+}
+
+# Apply the function to each row in the 'value' column and store the result in a new column 'value_clean'
+item_properties[, value_clean := sapply(value, extract_numeric_value)]
+
 
 # Check conversion
 summary(item_properties$value_clean)
+
+
+# Even though many values in the file are hashed to protect confidentiality, not all values are treated the same way. 
+
+# Text or categorical values are hashed to anonymize the data. These values aren’t meant to be interpreted numerically.
+
+# Certain properties like price or other quantitative attributes are meant to be used in calculations. These numeric values are stored with an "n" prefix (e.g., "n5.000") to denote that they are numbers with a specific precision. They are not hashed; they're just formatted as strings with that prefix.
 ```
 
 ```{r}
+
 # For columns like property that are hashed, ensure that the same hash represents the same property across different rows.
 # Group by itemid and property to see if there are any inconsistencies.
 
@@ -255,6 +291,7 @@ summary(item_properties$value_clean)
 ```
 
 ```{r}
+
 # Merging datasets
 # Perform a Rolling Join
 # A rolling join allows you to match each event with the most recent (previous) item property snapshot.
@@ -272,14 +309,17 @@ setkey(item_properties, itemid, timestamp)
 
 # Rolling join: for each event, get the most recent snapshot from item properties.
 # This matches on 'itemid' and finds the snapshot with a timestamp less than or equal to the event timestamp.
-merged_data <- item_properties[events, on = .(itemid, timestamp), roll = TRUE]
+# merged_data <- item_properties[events, on = .(itemid, timestamp), roll = TRUE]
+
+
+merged_data <- events[item_properties, on = .(itemid, timestamp), roll = TRUE]
 
 # Inspect the merged result
 head(merged_data)
 
 # Both events and item_props are keyed by itemid and timestamp. This ensures the join is performed efficiently.
 
-# Rolling Join (roll = TRUE): When you join item_props with events, the roll = TRUE option tells data.table to find, for each event, the row in item_props with the closest timestamp that does not exceed the event's timestamp. This aligns each event with the proper snapshot of the item properties.
+# Rolling Join (roll = TRUE): When you join item_props  with events, the roll = TRUE option tells data.table to find, for each event, the row in item_props with the closest timestamp that does not exceed the event's timestamp. This aligns each event with the proper snapshot of the item properties.
 ```
 
 ```{r}
@@ -303,7 +343,6 @@ events_with_category <- category_property[events, on = .(itemid, timestamp), rol
 ```
 
 ```{r}
-
 # Rename and Prepare the Category Identifier
 # For clarity, rename the column containing the category identifier. 
 events_with_category[, categoryid := value_clean]
