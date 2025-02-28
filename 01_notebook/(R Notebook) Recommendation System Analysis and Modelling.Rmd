@@ -267,6 +267,7 @@ events_counts %>%
 > -   **Event Density:** Calculate the number of events per minute or per session. Extremely high densities can signal bot behaviour.
 
 ```{r}
+
 # --------------------------------------
 # Abnormally Detection
 # --------------------------------------
