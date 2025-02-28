@@ -347,7 +347,6 @@ library(isotree)
 features <- as.data.frame(visitor_stats[, .(total_events, avg_time_diff, median_time_diff)])
 
 # Initialize and fit the Isolation Forest model.
-
 iso_model <- isolation.forest(features, ntree = 100, sample_size = nrow(features), seed = 42)
 
 # Get predictions which include an 'anomaly_score' for each user.
