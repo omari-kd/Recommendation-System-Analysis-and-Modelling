@@ -67,19 +67,29 @@ output: html_notebook
 ### **3. Data Preparation:**
 
 ```{r}
+# ----------------------------
 # Load libraries
+# ----------------------------
 library(data.table)
 library(dplyr)
 library(tidyr)
 library(ggplot2)
 library(caret)
 library(janitor)
+library(reshape2)
+library(scales)
+library(lubridate)
+# library(solitude)
 ```
 
 ```{r}
 
+# -------------------------------------
+# Chunk Function
+# -------------------------------------
+
 read_in_chunks <- function(file_path, chunk_size = 10000, ...) {
-  # Open the file connection for reading
+  # 1. Open the file connection for reading
   con <- file(file_path, open = "r")
   
   # Read the header line (assumes CSV header is in the first line)
@@ -140,18 +150,9 @@ item_properties_2 <- read_in_chunks("./00_raw_data/item_properties_part2.csv")
 # item_properites <- c(item_properties_1, item_properties_2)
 ```
 
-```{r}
-# Bind events to data frame
-events <- rbindlist(events)
-```
+> **Data Preprocessing for category_tree**
 
 ```{r}
-# Bind item properties 1 & 2 in a data frame
-item_properties <- do.call(rbind, c(item_properties_1, item_properties_2))
-```
-
-```{r}
-# Data cleaning for category_tree
 # Check for duplicates and clean column names
 sum(duplicated(category_tree))
 ```
@@ -166,8 +167,14 @@ colSums(is.na(category_tree) | category_tree == "")
 str(category_tree)
 ```
 
+> **Data Preprocessing for events**
+
 ```{r}
-# Data Cleaning for events 
+# Bind events to data frame
+events <- rbindlist(events)
+```
+
+```{r}
 # Check for duplicates in events
 sum(duplicated(events))
 
@@ -181,6 +188,12 @@ sum(duplicated(events))
 ```{r}
 # Check for NA's in events
 colSums(is.na(events) | events == "")
+```
+
+```{r}
+# Replace the NA's in the transactions for View and Add to cart since both don't involve any transactions
+
+events$transactionid <- replace_na(events$transactionid, 0)
 ```
 
 ```{r}
@@ -202,8 +215,185 @@ events[, event := as.factor(event)]
 # Check datatype or class of the variable timestamp
 class(events$timestamp)
 
-# Convert to POSIXct
+# Convert to POSIXct# Calculate thresholds while removing NA values
 events$timestamp <- as.POSIXct(events$timestamp / 1000, origin = "1970-01-01", tz = "UTC")
+```
+
+```{r}
+# Data Visualisation
+options(scipen = 999)
+
+events_counts <- events %>% 
+  group_by(event) %>% 
+  summarise(count = n())
+
+events_counts %>%
+  ggplot(aes(x = event, y = count, fill = event)) + 
+  geom_bar(stat = "identity", position = "dodge", color = NA, width = 0.7) +
+  geom_text(aes(label = count), vjust = -0.5, color = "black") +
+  ylim (0, 3000000) +
+  labs(
+    title = "Distribution of User Events",
+    x = "Event Type",
+    y = "Count"
+  )
+
+```
+
+> [The chart above visualises the distribution of user events, addtocarts, transaction, view.]{style="text-align: justify"}
+>
+> [A. View Events: The view event category has the highest count by significant margin, with a total of 2,644, 218 events. This suggests visitors are viewing items on the platform.]{style="text-align: justify"}
+>
+> [B. Add to Cart Events: There are 68,966 events where visitors or users have added items to their cart. This is a positive sign as it indicates user interest in purchasing, although the number is much lower compared to the events.]{style="text-align: justify"}
+>
+> [C. Transaction Events: This category has the lowest count with 22,457 events. This represents the number of completed transactions, which is a critical metric for revenue generation.]{style="text-align: justify"}
+>
+> [Analysis:]{style="text-align: justify"}
+>
+> [The large number of view events compared to add to carts and transaction events suggest that there might be a drop-off in the conversion funnel (A conversion funnel, also known as a sales funnel or marketing funnel, is a visual representation of the customer journey from the first point of contact with a business to the final purchase or desired action. It's a model used to understand how potential customers move through different stages towards conversion, which is typically a sale but can also be any other desired action like signing up for a newsletter, downloading a whitepaper, purchasing product, et.) Users are viewing content but not as many are proceeding to add items to cart or complete transactions.]{style="text-align: justify"}
+>
+> [The ratio of view to transaction events is quite high. This could indicate that there are barriers to conversion, such as high prices, a poor user experience or lack of trust in the platform.]{style="text-align: justify"}
+>
+> [The add to cart events are significantly higher than transactions, which is expected, but the gap is quite large. This could mean that users are adding items to their carts but not completing the purchase. Reasons could include abandoned carts, issues during the checkout process, or the user deciding against the purchase at the last moment.]{style="text-align: justify"}
+
+> ### **Abnormal Bot Users Detection**
+>
+> **Strategies for Bot Detection**
+>
+> **Event Frequency and Volume:**
+>
+> -   **High Activity:** Bots may generate a significantly higher number of events (e.g., views, add-to-carts, transactions) than typical users in a short time frame.
+>
+> -   **Event Density:** Calculate the number of events per minute or per session. Extremely high densities can signal bot behaviour.
+
+```{r}
+# --------------------------------------
+# Abnormally Detection
+# --------------------------------------
+
+# setnames
+# setnames(events, c("timestamp", "visitorid", "event", "itemid", "transaction"))
+
+# Calculate event frequency per visitor (total events, events per minute, etc.)
+# Assuming events are sorted by timestamp for each visitor
+setorder(events, visitorid, timestamp)
+
+# Calculate the time difference between consecutive events for each visitor
+events[, time_diff := as.numeric(difftime(timestamp, shift(timestamp), units = "secs")), by = visitorid]
+
+# Aggregate statistics per visitor: total events, median time difference, etc.
+visitor_stats <- events[, .(
+  total_events = .N,
+  avg_time_diff = mean(time_diff, na.rm = TRUE),
+  median_time_diff = median(time_diff, na.rm = TRUE)
+), by = visitorid]
+
+# Identify potential bots:
+# For instance, flag users with unusually high total events or very low average time difference.
+# These thresholds may need tuning based on your data.
+# Calculate thresholds while removing NA values
+bot_threshold_events <- quantile(visitor_stats$total_events, 0.95, na.rm = TRUE)   # Top 5% activity
+bot_threshold_time <- quantile(visitor_stats$avg_time_diff, 0.05, na.rm = TRUE)      # Bottom 5% time gaps
+
+visitor_stats[, bot_flag := (total_events > bot_threshold_events) | (avg_time_diff < bot_threshold_time)]
+
+# Inspect flagged potential bots
+potential_bots <- visitor_stats[bot_flag == TRUE]
+print(potential_bots)
+
+# Print number of potential bots
+print(paste("Number of potential bots: ", nrow(potential_bots)))
+
+# Show top ten bots
+top_ten_bots <- potential_bots[order(-total_events)][1:10]
+print(top_ten_bots)
+```
+
+> **Time Difference Calculation:**\
+> By computing the time difference between consecutive events, one can observe if some visitors have extremely short intervals between actions which is a common bot behaviours.
+>
+> **\
+> Aggregation and Thresholds:**\
+> Aggregating by visitor allows the computation of overall activity metrics (e.g., total events, average time between events). Setting thresholds based on quantiles (e.g., top 5% for total events, bottom 5% for average time difference) provides a starting point for flagging anomalies
+
+```{r}
+
+# ------------------------------
+# Remove Bots
+# -------------------------------
+
+# Remove events associated with bot users from the events data
+# clean_events_df <- events[!visitorid %in% potential_bots$visitorid]
+
+# Verify how many events remain after removing bot-related events
+# cat("Number of events after removing bots:", nrow(clean_events_df), "\n")
+
+```
+
+> **Isolation Forest for Anomaly Detection**
+>
+> This step adds a sophisticated, model-based layer of bot detection on top of the simple activity threshold.
+
+```{r}
+# ---------------------------------------
+# Isolation Forest for Anomaly Detection
+# ---------------------------------------
+
+library(isotree)
+
+# Prepare features for the Isolation Forest model.
+# Use the aggregated metrics: total_events, avg_time_diff, and median_time_diff.
+features <- as.data.frame(visitor_stats[, .(total_events, avg_time_diff, median_time_diff)])
+
+# Initialize and fit the Isolation Forest model.
+
+iso_model <- isolation.forest(features, ntree = 100, sample_size = nrow(features), seed = 42)
+
+# Get predictions which include an 'anomaly_score' for each user.
+predictions <- predict(iso_model, newdata = features)
+
+# Inspect the predictions. 
+head(predictions)
+
+
+# Add the anomaly score to the visitor_stats data.table.
+visitor_stats[, anomaly_score := predictions$anomaly_score]
+
+# Flag a user as anomalous if their anomaly_score is in the top 1% of scores.
+anomaly_threshold <- quantile(predictions$anomaly_score, 0.99, na.rm = TRUE)
+visitor_stats[, anomaly_flag := ifelse(predictions$anomaly_score > anomaly_threshold, -1, 1)]
+
+
+# -----------------------------
+# Combine Detection Criteria
+# -----------------------------
+
+
+# A visitor is flagged as a bot if they meet either the rule-based criteria or the Isolation Forest criteria.
+visitor_stats[, final_bot_flag := (bot_flag_rule == TRUE) | (anomaly_flag == -1)]
+
+# Identify the final list of bot users.
+bot_users <- visitor_stats[final_bot_flag == TRUE]
+print(paste("Number of bots detected (combined):", nrow(bot_users)))
+
+
+
+# --------------------------------------
+# Filter Out Bot Users from Events Data
+# -------------------------------------
+
+# Remove all events associated with flagged bot users.
+cleaned_events <- events[!visitorid %in% bot_users$visitorid]
+
+# Check how many unique users remain.
+print(paste("Remaining unique users after bot removal:", uniqueN(cleaned_events$visitorid)))
+```
+
+**Data Proprocessing for item_properties**
+
+```{r}
+# Bind item properties 1 & 2 in a data frame
+item_properties <- do.call(rbind, c(item_properties_1, item_properties_2))
 ```
 
 ```{r}
@@ -223,15 +413,43 @@ item_properties$timestamp <- as.POSIXct(item_properties$timestamp / 1000, origin
 ```
 
 ```{r}
+# 1. Keep only the latest property value for each item
+# Sort by 'itemid' and 'timestamp', then group by itemid and keep the lastest row
+item_properties <- item_properties %>%
+  arrange(itemid, timestamp) %>%
+  group_by(itemid) %>%
+  slice_tail(n = 1) %>%
+  ungroup()
+
+# 2. Filter for category and availability properties
+item_properties_filtered <- item_properties %>%
+  filter(property %in% c("categoryid", "available"))
+
+# 3. Restructure or pivot the data so that each item has its categoryid & available as separate columns
+item_properties_restructure <- item_properties_filtered %>%
+  pivot_wider(names_from = property, values_from = value)
+
+# 4. Convert availability to numeric and then to integer (0 or 1)
+# First, convert to numeric and replace NAs with 0
+item_properties_restructure <- item_properties_restructure %>%
+  mutate(available = as.numeric(available)) 
+
+# Replace NA's in 'available' with 0, then convert to integer
+item_properties_restructure$available[is.na(item_properties_restructure$available)] <- 0
+item_properties_restructure <- item_properties_restructure %>%
+  mutate(available = as.integer(available))
+```
+
+```{r}
 # Clean numeric values
 # Use string functions to remove the prefix and then convert them to numeric.
 # Some of the 'value' column sometimes starts with "n"
 
 # Check Class
-class(item_properties)
+# class(item_properties)
 
 # Set to data.table
-setDT(item_properties)
+# setDT(item_properties)
 
 # Apply the operation
 # item_properties[, value := trimws(value)]
@@ -245,22 +463,22 @@ setDT(item_properties)
 # Round to 3 decimanls for precision
 # item_properties[, value_clean := round(value_clean, 3)]
 
-extract_numeric_value <- function(x) {
+# extract_numeric_value <- function(x) {
   # Split the string by whitespace
-  tokens <- strsplit(x, " ")[[1]]
+  # tokens <- strsplit(x, " ")[[1]]
   
   # Find tokens that start with "n" (one or more)
-  n_tokens <- grep("^n+", tokens, value = TRUE)
+  # n_tokens <- grep("^n+", tokens, value = TRUE)
   
-  if (length(n_tokens) > 0) {
+  # if (length(n_tokens) > 0) {
     # If multiple tokens start with n, choose the first one (or apply your logic here)
     # Remove the "n" prefix(s) and convert to numeric
-    return(as.numeric(gsub("^n+", "", n_tokens[1])))
-  } else {
+    # return(as.numeric(gsub("^n+", "", n_tokens[1])))
+  # } else {
     # Optionally: if no token with "n" is found, you could decide to return NA or try to convert the first token
-    return(as.numeric(tokens[1]))
-  }
-}
+    # return(as.numeric(tokens[1]))
+  # }
+# }
 
 # Apply the function to each row in the 'value' column and store the result in a new column 'value_clean'
 item_properties[, value_clean := sapply(value, extract_numeric_value)]
@@ -277,90 +495,88 @@ summary(item_properties$value_clean)
 # Certain properties like price or other quantitative attributes are meant to be used in calculations. These numeric values are stored with an "n" prefix (e.g., "n5.000") to denote that they are numbers with a specific precision. They are not hashed; they're just formatted as strings with that prefix.
 ```
 
-```{r}
-
-# For columns like property that are hashed, ensure that the same hash represents the same property across different rows.
-# Group by itemid and property to see if there are any inconsistencies.
-
-# Count distinct value entries for each combination of item and property
-# consistency_check <- item_properties[, .(unique_values = uniqueN(value_clean)), by = .(itemid, property)]
-
-# If a property is expected to be constant, unique_values should be 1.
-# summary(consistency_check$unique_values)
-
-```
-
-```{r}
-
-# Merging datasets
-# Perform a Rolling Join
-# A rolling join allows you to match each event with the most recent (previous) item property snapshot.
-
-# Set event to data.table
-setDT(events)
-
-# Order the data by itemid and timestamp
-setorder(events, itemid, timestamp)
-setorder(item_properties, itemid, timestamp)
-
-# Set keys for a rolling join
-setkey(events, itemid, timestamp)
-setkey(item_properties, itemid, timestamp)
-
-# Rolling join: for each event, get the most recent snapshot from item properties.
-# This matches on 'itemid' and finds the snapshot with a timestamp less than or equal to the event timestamp.
-# merged_data <- item_properties[events, on = .(itemid, timestamp), roll = TRUE]
-
-
-merged_data <- events[item_properties, on = .(itemid, timestamp), roll = TRUE]
-
-# Inspect the merged result
-head(merged_data)
-
-# Both events and item_props are keyed by itemid and timestamp. This ensures the join is performed efficiently.
-
-# Rolling Join (roll = TRUE): When you join item_props  with events, the roll = TRUE option tells data.table to find, for each event, the row in item_props with the closest timestamp that does not exceed the event's timestamp. This aligns each event with the proper snapshot of the item properties.
-```
-
-```{r}
-# Filter the item properties data to isolate the rows where the property is "categoryid". This gives you the actual category identifier for each item.
-
-category_property <- item_properties[property == "categoryid"]
-
-# Perform a rolling join Since item properties are time-dependent, align each event with the most recent "categoryid" snapshot preceding the event time
-
-# Order and set keys for rolling join
-setorder(category_property, itemid, timestamp)
-setorder(events, itemid, timestamp)
-setkey(category_property, itemid, timestamp)
-setkey(events, itemid, timestamp)
-
-
-# Rolling join: For each event, get the most recent "categoryid" snapshot
-events_with_category <- category_property[events, on = .(itemid, timestamp), roll = TRUE]
-
-# Rolling Join (roll = TRUE): When you join item_props with events, the roll = TRUE option tells data.table to find, for each event, the row in item_props with the closest timestamp that does not exceed the event's timestamp. This aligns each event with the proper snapshot of the item properties
-```
-
-```{r}
-# Rename and Prepare the Category Identifier
-# For clarity, rename the column containing the category identifier. 
-events_with_category[, categoryid := value_clean]
-
-
-# Merge with category tree
-# setKey
-setkey(category_tree, categoryid)
-setkey(events_with_category, categoryid)
-
-
-# Merge the category tree with the events data
-final_data <- merge(events_with_category, category_tree, by = "categoryid", all.x = TRUE)
-
-
-# In the merge() function in R, the all.x = TRUE argument specifies that the merge should be left join (keeping all rows from the left dataset and only matching rows from the right dataset).
-```
-
-\
-
-\
+> ```{r}
+> >
+> # For columns like property that are hashed, ensure that the same hash represents the same property across different rows.
+> # Group by itemid and property to see if there are any inconsistencies.
+> >
+> # Count distinct value entries for each combination of item and property
+> # consistency_check <- item_properties[, .(unique_values = uniqueN(value_clean)), by = .(itemid, property)]
+> >
+> # If a property is expected to be constant, unique_values should be 1.
+> # summary(consistency_check$unique_values)
+> >
+> ```
+>
+> ```{r}
+> >
+> # Merging datasets
+> # Perform a Rolling Join
+> # A rolling join allows you to match each event with the most recent (previous) item property snapshot.
+> >
+> # Set event to data.table
+> setDT(events)
+> >
+> # Order the data by itemid and timestamp
+> setorder(events, itemid, timestamp)
+> setorder(item_properties, itemid, timestamp)
+> >
+> # Set keys for a rolling join
+> setkey(events, itemid, timestamp)
+> setkey(item_properties, itemid, timestamp)
+> >
+> # Rolling join: for each event, get the most recent snapshot from item properties.
+> # This matches on 'itemid' and finds the snapshot with a timestamp less than or equal to the event timestamp.
+> # merged_data <- item_properties[events, on = .(itemid, timestamp), roll = TRUE]
+> >
+> >
+> merged_data <- events[item_properties, on = .(itemid, timestamp), roll = TRUE]
+> >
+> # Inspect the merged result
+> head(merged_data)
+> >
+> # Both events and item_props are keyed by itemid and timestamp. This ensures the join is performed efficiently.
+> >
+> # Rolling Join (roll = TRUE): When you join item_props  with events, the roll = TRUE option tells data.table to find, for each event, the row in item_props with the closest timestamp that does not exceed the event's timestamp. This aligns each event with the proper snapshot of the item properties.
+> ```
+>
+> ```{r}
+> # Filter the item properties data to isolate the rows where the property is "categoryid". This gives you the actual category identifier for each item.
+> >
+> category_property <- item_properties[property == "categoryid"]
+> >
+> # Perform a rolling join Since item properties are time-dependent, align each event with the most recent "categoryid" snapshot preceding the event time
+> >
+> # Order and set keys for rolling join
+> setorder(category_property, itemid, timestamp)
+> setorder(events, itemid, timestamp)
+> setkey(category_property, itemid, timestamp)
+> setkey(events, itemid, timestamp)
+> >
+> >
+> # Rolling join: For each event, get the most recent "categoryid" snapshot
+> events_with_category <- category_property[events, on = .(itemid, timestamp), roll = TRUE]
+> >
+> # Rolling Join (roll = TRUE): When you join item_props with events, the roll = TRUE option tells data.table to find, for each event, the row in item_props with the closest timestamp that does not exceed the event's timestamp. This aligns each event with the proper snapshot of the item properties
+> ```
+>
+> ```{r}
+> # Rename and Prepare the Category Identifier
+> # For clarity, rename the column containing the category identifier. 
+> events_with_category[, categoryid := value_clean]
+> >
+> >
+> # Merge with category tree
+> # setKey
+> setkey(category_tree, categoryid)
+> setkey(events_with_category, categoryid)
+> >
+> >
+> # Merge the category tree with the events data
+> final_data <- merge(events_with_category, category_tree, by = "categoryid", all.x = TRUE)
+> >
+> >
+> # In the merge() function in R, the all.x = TRUE argument specifies that the merge should be left join (keeping all rows from the left dataset and only matching rows from the right dataset).
+> ```
+>
+> \
