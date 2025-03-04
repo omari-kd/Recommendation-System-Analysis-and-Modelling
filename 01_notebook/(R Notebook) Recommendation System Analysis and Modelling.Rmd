@@ -620,11 +620,11 @@ ggplot(daily_events, aes(x = date, y = total_events)) +
 
 ```{r}
 
-ggplot(cleaned_events[!is.na(time_diff)], aes(x = time_diff)) +
-  geom_histogram(binwidth = 10, fill = "coral", color = "black", alpha = 0.7) +
-  labs(title = "Distribution of Time Differences Between Events", 
-       x = "Time Difference (seconds)", y = "Frequency") +
-  theme_minimal()
+#ggplot(cleaned_events[!is.na(time_diff)], aes(x = time_diff)) +
+ # geom_histogram(binwidth = 10, fill = "coral", color = "black", alpha = 0.7) +
+  #labs(title = "Distribution of Time Differences Between Events", 
+   #    x = "Time Difference (seconds)", y = "Frequency") +
+  #theme_minimal()
 
 ```
 
@@ -632,8 +632,8 @@ ggplot(cleaned_events[!is.na(time_diff)], aes(x = time_diff)) +
 
 ```{r}
 # Extract hour and day of week from datetime
-cleaned_events[, hour := hour(datetime)]
-cleaned_events[, weekday := weekdays(datetime)]
+cleaned_events[, hour := hour(timestamp)]
+cleaned_events[, weekday := weekdays(timestamp)]
 
 # Aggregate event counts by hour and weekday
 heatmap_data <- cleaned_events[, .(count = .N), by = .(weekday, hour)]
