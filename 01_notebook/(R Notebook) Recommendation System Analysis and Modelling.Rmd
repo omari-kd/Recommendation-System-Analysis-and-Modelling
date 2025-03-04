@@ -60,8 +60,6 @@ output: html_notebook
 > This file contains 20,275,902 rows, representing various properties of 417,053 unique items. Each property may change over time (e.g., price updates), with each row capturing a snapshot of an item’s property at a specific timestamp. For items with constant properties, only a single snapshot is recorded. The file is split into two due to its size, and it contains detailed item information, which is essential for building item profiles and understanding how item properties influence user behaviour.
 >
 > 2.3 Category Tree (category_tree.csv)
->
-> The category_tree.csv file outlines the hierarchical structure of item categories. It provides a category-based organisation of the products, which can help in grouping items into broader categories or subcategories. This file is important for building models that recommend items within specific categories or using category-based clustering for recommendations.
 > :::
 
 ### **3. Data Preparation:**
@@ -79,7 +77,7 @@ library(janitor)
 library(reshape2)
 library(scales)
 library(lubridate)
-# library(solitude)
+library(isotree)  
 ```
 
 ```{r}
@@ -192,7 +190,6 @@ colSums(is.na(events) | events == "")
 
 ```{r}
 # Replace the NA's in the transactions for View and Add to cart since both don't involve any transactions
-
 events$transactionid <- replace_na(events$transactionid, 0)
 ```
 
@@ -256,6 +253,43 @@ events_counts %>%
 >
 > [The add to cart events are significantly higher than transactions, which is expected, but the gap is quite large. This could mean that users are adding items to their carts but not completing the purchase. Reasons could include abandoned carts, issues during the checkout process, or the user deciding against the purchase at the last moment.]{style="text-align: justify"}
 
+**Conversion Rates**
+
+Integrating conversion rates in the analysis is key, as it helps to to segment users, compare against normal behaviour or as additional features in your recommendation or anomaly detection models.
+
+Also tracking conversion rates can help you detect issues or improvements in your user funnel and overall system performance.
+
+Lastly, If there is a suspiscion of some users are bots, you might compare their conversion rates with genuine users to see if there are significant differences, which further validates the bot detection.
+
+```{r}
+# Count the number of each event per visitor
+user_event_counts <- dcast(events, visitorid ~ event, fun.aggregate = length, value.var = "event", fill = 0)
+setnames(user_event_counts, old = c("view", "addtocart", "transaction"),
+         new = c("num_view", "num_addtocart", "num_transaction"))
+
+
+setDT(user_event_counts)
+# Calculate conversion rates per visitor
+user_event_counts[, conversion_view_to_add := ifelse(num_view > 0, num_addtocart / num_view, 0)]
+user_event_counts[, conversion_add_to_transaction := ifelse(num_addtocart > 0, num_transaction / num_addtocart, 0)]
+user_event_counts[, conversion_view_to_transaction := ifelse(num_view > 0, num_transaction / num_view, 0)]
+
+# Inspect the calculated conversion rates
+head(user_event_counts)
+```
+
+```{r}
+# Histogram for the view-to-add conversion rate
+ggplot(user_event_counts, aes(x = conversion_view_to_add)) +
+  geom_histogram(binwidth = 0.05, fill = "steelblue", color = "black", na.rm = TRUE) +
+  labs(
+    title = "Distribution of View-to-Add Conversion Rate",
+    x = "Conversion Rate (Add-to-View)",
+    y = "Number of Users"
+  ) +
+  theme_minimal()
+```
+
 > ### **Abnormal Bot Users Detection**
 >
 > **Strategies for Bot Detection**
@@ -268,7 +302,7 @@ events_counts %>%
 
 ```{r}
 
-# --------------------------------------
+ # --------------------------------------
 # Abnormally Detection
 # --------------------------------------
 
@@ -311,7 +345,7 @@ print(top_ten_bots)
 ```
 
 > **Time Difference Calculation:**\
-> By computing the time difference between consecutive events, one can observe if some visitors have extremely short intervals between actions which is a common bot behaviours.
+> By computing the time difference between consecutive events, one can observe if some visitors have extremely short intervals between actions which is manchester uniteda common bot behaviours.
 >
 > **\
 > Aggregation and Thresholds:**\
@@ -340,35 +374,48 @@ print(top_ten_bots)
 # Isolation Forest for Anomaly Detection
 # ---------------------------------------
 
-library(isotree)
-
 # Prepare features for the Isolation Forest model.
 # Use the aggregated metrics: total_events, avg_time_diff, and median_time_diff.
 features <- as.data.frame(visitor_stats[, .(total_events, avg_time_diff, median_time_diff)])
 
-# Initialize and fit the Isolation Forest model.
-iso_model <- isolation.forest(features, ntree = 100, sample_size = nrow(features), seed = 42)
+# Check structure of features to ensure all columns are numeric
+str(features)
 
-# Get predictions which include an 'anomaly_score' for each user.
+# Initialize and fit the Isolation Forest model.
+iso_model <- isolation.forest(features, ntrees = 100, sample_size = nrow(features), seed = 42)
+
+# Get predictions which include an anomaly score for each user.
 predictions <- predict(iso_model, newdata = features)
 
-# Inspect the predictions. 
+# Debugging: Check the structure and content of predictions.
+str(predictions)
 head(predictions)
 
+# If predictions is an atomic vector of numeric values, add it directly.
+visitor_stats[, anomaly_score := predictions]
 
-# Add the anomaly score to the visitor_stats data.table.
-visitor_stats[, anomaly_score := predictions$anomaly_score]
+# Define an anomaly threshold: Flag users whose anomaly score is in the top 1% as anomalies.
+anomaly_threshold <- quantile(predictions, 0.99, na.rm = TRUE)
+visitor_stats[, anomaly_flag := ifelse(anomaly_score > anomaly_threshold, -1, 1)]
 
-# Flag a user as anomalous if their anomaly_score is in the top 1% of scores.
-anomaly_threshold <- quantile(predictions$anomaly_score, 0.99, na.rm = TRUE)
-visitor_stats[, anomaly_flag := ifelse(predictions$anomaly_score > anomaly_threshold, -1, 1)]
+# Check the updated visitor_stats
+print(head(visitor_stats))
 
+```
 
+```{r}
 # -----------------------------
-# Combine Detection Criteria
+# STEP 6: Combine Detection Criteria
 # -----------------------------
+# Define thresholds for rule-based bot detection
+bot_threshold_events <- quantile(visitor_stats$total_events, 0.95, na.rm = TRUE)
+bot_threshold_time <- quantile(visitor_stats$avg_time_diff, 0.05, na.rm = TRUE)
+
+# Create the bot_flag_rule column based on the thresholds
+visitor_stats[, bot_flag_rule := (total_events > bot_threshold_events) | (avg_time_diff < bot_threshold_time)]
 
 
+# Define a final flag for bots:
 # A visitor is flagged as a bot if they meet either the rule-based criteria or the Isolation Forest criteria.
 visitor_stats[, final_bot_flag := (bot_flag_rule == TRUE) | (anomaly_flag == -1)]
 
@@ -376,20 +423,234 @@ visitor_stats[, final_bot_flag := (bot_flag_rule == TRUE) | (anomaly_flag == -1)
 bot_users <- visitor_stats[final_bot_flag == TRUE]
 print(paste("Number of bots detected (combined):", nrow(bot_users)))
 
-
-
-# --------------------------------------
-# Filter Out Bot Users from Events Data
-# -------------------------------------
+# -----------------------------
+# STEP 7: Filter Out Bot Users from Events Data
+# -----------------------------
 
 # Remove all events associated with flagged bot users.
 cleaned_events <- events[!visitorid %in% bot_users$visitorid]
 
-# Check how many unique users remain.
+# Optionally, check how many unique users remain.
 print(paste("Remaining unique users after bot removal:", uniqueN(cleaned_events$visitorid)))
+
 ```
 
-**Data Proprocessing for item_properties**
+**Visualizing Bot Detection Results**
+
+```{r}
+# Density plot of anomaly scores
+ggplot(visitor_stats, aes(x = anomaly_score, fill = factor(final_bot_flag))) +
+  geom_density(alpha = 0.5) +
+  labs(title = "Density of Anomaly Scores", x = "Anomaly Score", fill = "Bot Flag") +
+  theme_minimal()
+```
+
+**Scatter Plot of User Activity versus Time Difference**
+
+Examine the relationship between the number of events and the average time difference per user. Bots might show distinct patterns compared to regular users.
+
+```{r}
+# Assuming visitor_stats already contains total_events and avg_time_diff
+ggplot(visitor_stats, aes(x = total_events, y = avg_time_diff)) +
+  geom_point(alpha = 0.5, color = "purple") +
+  scale_x_log10() +  # Log scale if there's a wide range in total_events
+  labs(title = "Total Events vs. Average Time Difference per User",
+       x = "Total Events (log scale)", y = "Average Time Difference (seconds)") +
+  theme_minimal()
+
+```
+
+**Data Visualisation after Anomaly Detection**
+
+```{r}
+# Data Visualisation
+options(scipen = 999)
+
+events_counts <- cleaned_events %>% 
+  group_by(event) %>% 
+  summarise(count = n())
+
+events_counts %>%
+  ggplot(aes(x = event, y = count, fill = event)) + 
+  geom_bar(stat = "identity", position = "dodge", color = NA, width = 0.7) +
+  geom_text(aes(label = count), vjust = -0.5, color = "black") +
+  ylim (0, 3000000) +
+  labs(
+    title = "Distribution of User Events After Bots Removal",
+    x = "Event Type",
+    y = "Count"
+  )
+
+```
+
+The charts show the distribution of user events after removing bots. The events tracked are 'view', 'addtocart' and 'transaction'.
+
+**Key Findings:**
+
+-   **Views**:
+
+    -   Before bot removal: 2,664,218
+
+    -   After bot removal: 1,817,072
+
+    -   **Drop**: 847,146 (31.8% reduction)
+
+    -   **Implication**: A significant portion of views were bot-generated, indicating inflated traffic metrics.
+
+-   **Addtocart**:
+
+    -   Before bot removal: 68,966
+
+    -   After bot removal: 22,947
+
+    -   **Drop**: 46,019 (66.7% reduction)
+
+    -   **Implication**: Bots contributed to addtocart actions, but less so compared to views.
+
+-   **Transactions**:
+
+    -   Before bot removal: 22,457
+
+    -   After bot removal: 5,392
+
+    -   **Drop**: 17,065 (75.9% reduction)
+
+    -   **Implication**: Transactions were less affected by bots, suggesting more genuine human actions.
+
+Analysis:
+
+The large drop in views suggests that the website's traffic was significantly inflated by bots, which could affect advertising revenue and perceived popularity.
+
+The drop in addtocart events indicates that user engagement might be lower than initially thought, suggesting a need to improve the user experience or product offerings.
+
+The 75.9% reduction means that bots contributed heavily to transaction counts, but the remaining transactions after bot removal are likely more reliable as genuine human activity. This makes transactions a more trustworthy metric for evaluating real user behaviour, even though the absolute drop was large.
+
+**Data Visualisation of Top Most Viewed Products**
+
+```{r}
+# Filter the events data for view events only
+view_events <- cleaned_events[event == "view"]
+
+# Aggregate the number of views per product (itemid)
+product_view_counts <- view_events[, .(view_count = .N), by = itemid]
+
+# Order by view_count in descending order
+setorder(product_view_counts, -view_count)
+
+# Select the top 10 most viewed products
+top_viewed_products <- head(product_view_counts, 10)
+
+# Create a bar plot with ggplot2
+ggplot(top_viewed_products, aes(x = reorder(itemid, view_count), y = view_count)) +
+  geom_bar(stat = "identity", fill = "steelblue") +
+  coord_flip() +
+  labs(
+    title = "Top 10 Most Viewed Products",
+    x = "Product (itemid)",
+    y = "View Count"
+  ) +
+  theme_minimal()
+
+```
+
+**Data Visualisation of Top Most Purchased Products**
+
+```{r}
+
+# Filter the events data for transaction events only
+purchase_events <- cleaned_events[event == "transaction"]
+
+# Aggregate the number of purchases per product (itemid)
+product_purchase_counts <- purchase_events[, .(purchase_count = .N), by = itemid]
+
+# Order by purchase_count in descending order
+setorder(product_purchase_counts, -purchase_count)
+
+# Select the top 10 most purchased products
+top_purchased_products <- head(product_purchase_counts, 10)
+
+# Create a bar plot with ggplot2
+ggplot(top_purchased_products, aes(x = reorder(itemid, purchase_count), y = purchase_count)) +
+  geom_bar(stat = "identity", fill = "forestgreen") +
+  coord_flip() +  # Flip axes for better readability
+  labs(
+    title = "Top 10 Most Purchased Products",
+    x = "Product (itemid)",
+    y = "Purchase Count"
+  ) +
+  theme_minimal()
+
+```
+
+**Conversion funnel visualisation**
+
+Show how many users progress through each stage of your funnel—from view to add-to-cart to transaction
+
+```{r}
+# Aggregate counts for each event type using the cleaned events (if desired)
+funnel_data <- cleaned_events[, .(
+  num_view = sum(event == "view"),
+  num_addtocart = sum(event == "addtocart"),
+  num_transaction = sum(event == "transaction")
+)]
+
+# Convert the data to long format for plotting
+funnel_long <- melt(funnel_data, measure.vars = c("num_view", "num_addtocart", "num_transaction"),
+                    variable.name = "stage", value.name = "count")
+
+ggplot(funnel_long, aes(x = stage, y = count)) +
+  geom_bar(stat = "identity", fill = "skyblue") +
+  labs(title = "Conversion Funnel", x = "Stage", y = "Event Count") +
+  theme_minimal()
+```
+
+**Data Visualisation of Time Series of Events Over Time**
+
+```{r}
+# Aggregate events by day (or week)
+daily_events <- cleaned_events[, .(total_events = .N), by = .(date = as.Date(timestamp))]
+  
+ggplot(daily_events, aes(x = date, y = total_events)) +
+  geom_line(color = "blue") +
+  labs(title = "Daily Total Events", x = "Date", y = "Number of Events") +
+  theme_minimal()
+```
+
+**Data Visualisation of Distribution of Time Differences**
+
+```{r}
+
+ggplot(cleaned_events[!is.na(time_diff)], aes(x = time_diff)) +
+  geom_histogram(binwidth = 10, fill = "coral", color = "black", alpha = 0.7) +
+  labs(title = "Distribution of Time Differences Between Events", 
+       x = "Time Difference (seconds)", y = "Frequency") +
+  theme_minimal()
+
+```
+
+**Heatmap of Event Activity by Hour and Day of Week**
+
+```{r}
+# Extract hour and day of week from datetime
+cleaned_events[, hour := hour(datetime)]
+cleaned_events[, weekday := weekdays(datetime)]
+
+# Aggregate event counts by hour and weekday
+heatmap_data <- cleaned_events[, .(count = .N), by = .(weekday, hour)]
+
+# Reorder weekdays (optional, for proper ordering)
+heatmap_data[, weekday := factor(weekday, levels = c("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"))]
+
+ggplot(heatmap_data, aes(x = hour, y = weekday, fill = count)) +
+  geom_tile() +
+  scale_fill_gradient(low = "white", high = "red") +
+  labs(title = "Heatmap of Events by Hour and Weekday", x = "Hour of Day", y = "Weekday") +
+  theme_minimal()
+
+```
+
+**\
+Data Preprocessing for item_properties**
 
 ```{r}
 # Bind item properties 1 & 2 in a data frame
@@ -578,5 +839,3 @@ summary(item_properties$value_clean)
 > >
 > # In the merge() function in R, the all.x = TRUE argument specifies that the merge should be left join (keeping all rows from the left dataset and only matching rows from the right dataset).
 > ```
->
-> \
