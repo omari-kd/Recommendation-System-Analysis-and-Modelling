@@ -650,7 +650,9 @@ ggplot(heatmap_data, aes(x = hour, y = weekday, fill = count)) +
 ```
 
 **\
-Data Preprocessing for item_properties**
+**
+
+**Data Preprocessing for item_properties**
 
 ```{r}
 # Bind item properties 1 & 2 in a data frame
