@@ -449,6 +449,10 @@ ggplot(visitor_stats, aes(x = anomaly_score, fill = factor(final_bot_flag))) +
 Examine the relationship between the number of events and the average time difference per user. Bots might show distinct patterns compared to regular users.
 
 ```{r}
+# ------------------------------------------------------
+#  Scatter Plot of User Activity versus Time Difference
+# ------------------------------------------------------
+
 # Assuming visitor_stats already contains total_events and avg_time_diff
 ggplot(visitor_stats, aes(x = total_events, y = avg_time_diff)) +
   geom_point(alpha = 0.5, color = "purple") +
@@ -462,7 +466,9 @@ ggplot(visitor_stats, aes(x = total_events, y = avg_time_diff)) +
 **Data Visualisation after Anomaly Detection**
 
 ```{r}
-# Data Visualisation
+# ----------------------------------------------------
+# Data Visualisation after Anomaly Detection
+# ----------------------------------------------------
 options(scipen = 999)
 
 events_counts <- cleaned_events %>% 
@@ -527,6 +533,10 @@ The 75.9% reduction means that bots contributed heavily to transaction counts, b
 **Data Visualisation of Top Most Viewed Products**
 
 ```{r}
+# -----------------------------------------------
+# Data Visualisation of Top Most Viewed Products
+# -----------------------------------------------
+
 # Filter the events data for view events only
 view_events <- cleaned_events[event == "view"]
 
@@ -555,6 +565,10 @@ ggplot(top_viewed_products, aes(x = reorder(itemid, view_count), y = view_count)
 **Data Visualisation of Top Most Purchased Products**
 
 ```{r}
+
+# --------------------------------------------------------
+# Data Visualisation of Top Most Purchased Products
+# --------------------------------------------------------
 
 # Filter the events data for transaction events only
 purchase_events <- cleaned_events[event == "transaction"]
@@ -586,6 +600,10 @@ ggplot(top_purchased_products, aes(x = reorder(itemid, purchase_count), y = purc
 Show how many users progress through each stage of your funnel—from view to add-to-cart to transaction
 
 ```{r}
+# ------------------------------------------
+# Conversion funnel visualisation
+# ------------------------------------------
+
 # Aggregate counts for each event type using the cleaned events (if desired)
 funnel_data <- cleaned_events[, .(
   num_view = sum(event == "view"),
@@ -606,6 +624,10 @@ ggplot(funnel_long, aes(x = stage, y = count)) +
 **Data Visualisation of Time Series of Events Over Time**
 
 ```{r}
+# -----------------------------------------------------
+# Data Visualisation of Time Series of Events Over Time
+# ------------------------------------------------------
+
 # Aggregate events by day (or week)
 daily_events <- cleaned_events[, .(total_events = .N), by = .(date = as.Date(timestamp))]
   
@@ -630,6 +652,11 @@ ggplot(daily_events, aes(x = date, y = total_events)) +
 **Heatmap of Event Activity by Hour and Day of Week**
 
 ```{r}
+# ---------------------------------------------------------
+# Heatmap of Event Activity by Hour and Day of Week
+# ----------------------------------------------------------
+
+
 # Extract hour and day of week from datetime
 cleaned_events[, hour := hour(timestamp)]
 cleaned_events[, weekday := weekdays(timestamp)]
@@ -642,16 +669,16 @@ heatmap_data[, weekday := factor(weekday, levels = c("Monday", "Tuesday", "Wedne
 
 ggplot(heatmap_data, aes(x = hour, y = weekday, fill = count)) +
   geom_tile() +
+ # geom_text(aes(label = count), color = "black", size = 3) +
   scale_fill_gradient(low = "white", high = "red") +
   labs(title = "Heatmap of Events by Hour and Weekday", x = "Hour of Day", y = "Weekday") +
   theme_minimal()
 
+
 ```
 
 **\
-**
-
-**Data Preprocessing for item_properties**
+Data Preprocessing for item_properties**
 
 ```{r}
 # Bind item properties 1 & 2 in a data frame
@@ -700,6 +727,27 @@ item_properties_restructure <- item_properties_restructure %>%
 item_properties_restructure$available[is.na(item_properties_restructure$available)] <- 0
 item_properties_restructure <- item_properties_restructure %>%
   mutate(available = as.integer(available))
+
+```
+
+**Merge cleaned_events and item_properties_restructure**
+
+```{r}
+# -----------------------------------------------------
+# Merge cleaned_events and item_properties_restructure
+# -----------------------------------------------------
+# Set event to data.table
+setDT(cleaned_events)
+
+# Order the data by itemid and timestamp
+setorder(cleaned_events, itemid, timestamp)
+setorder(item_properties_restructure, itemid, timestamp)
+
+# Set keys for the left join
+setkey(cleaned_events, itemid, timestamp)
+setkey(item_properties_restructure, itemid, timestamp)
+
+merged_data <- cleaned_events[item_properties, on = .(itemid, timestamp), roll = TRUE]
 ```
 
 ```{r}
