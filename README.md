@@ -116,6 +116,11 @@ The category_tree.csv file outlines the hierarchical structure of item categorie
 
 • The dataset was sorted chronologically by visitorid and timestamp. This ordering was crucial for computing time differences between consecutive events for each visitor. The shift function in data.table was used to calculate these differences in seconds. Naturally, the first event for each visitor resulted in an NA value since no preceding event existed. Negative time differences or other anomalies were checked to ensure data integrity.
 
+• After ensuring that the dataset was free of duplicates, missing values and bot-generated noise, the cleaned data was exported as a new CSV file, serving as a reliable foundation for further analysis.
+
+
+
+
 • Once cleaned and standardised, the dataset was exported as a new CSV file.
 
 ##### Bot Detection and Removal
