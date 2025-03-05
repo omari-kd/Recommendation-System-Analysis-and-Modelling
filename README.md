@@ -103,9 +103,10 @@ This file contains 20,275,902 rows, representing various properties of 417,053 u
 The category_tree.csv file outlines the hierarchical structure of item categories. It provides a category-based organisation of the products, which can help in grouping items into broader categories or subcategories. This file is important for building models that recommend items within specific categories or using category-based clustering for recommendations.
 
 ### 3. Data Preparation: 
-• To ensure the dataset was ready for analysis a meticulous data preparation process was carried out as follows:
+#### a. Event file
+• To ensure the dataset was ready for analysis, a meticulous data preparation process was carried out as follows:
 
-• The events file was read using a read-in-chunk function. This function enables large files to be loaded in smaller manageable portions thereby preventing memory overload and ensuring efficiency. The chunks were then bound into a single data frame.
+• The events file was read using a read-in-chunk function. This function enables large files to be loaded in smaller manageable portions, thereby preventing memory overload and ensuring efficiency. The chunks were then bound into a single data frame.
 
 • The dataset was inspected thoroughly to understand its structure and content. Columns were verified to match the document description and then standardised to "timestamp", "visitorid", "event", "itemid" and "transaction" to ensure consistency throughout the project.
 
@@ -113,9 +114,9 @@ The category_tree.csv file outlines the hierarchical structure of item categorie
 
 • Duplicate rows were removed to eliminate any repeated events that might skew the analysis.
 
-• The dataset was sorted chronologically by visitorid and timestamp. This ordering was crucial for computing time differences between consecutive events for each visitor. The shift function in data.table was used to calculate these differences in seconds. Naturally the first event for each visitor resulted in an NA value since no preceding event existed. Negative time differences or other anomalies were checked to ensure data integrity.
+• The dataset was sorted chronologically by visitorid and timestamp. This ordering was crucial for computing time differences between consecutive events for each visitor. The shift function in data.table was used to calculate these differences in seconds. Naturally, the first event for each visitor resulted in an NA value since no preceding event existed. Negative time differences or other anomalies were checked to ensure data integrity.
 
-• Once cleaned and standardised the dataset was exported as a new CSV file.
+• Once cleaned and standardised, the dataset was exported as a new CSV file.
 
 ##### Bot Detection and Removal
 
