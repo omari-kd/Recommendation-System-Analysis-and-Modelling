@@ -138,10 +138,10 @@ The two parts of the item properties file (part 1 and part 2) were combined into
 Timestamps in the item properties dataset were originally in Unix time (milliseconds since the epoch). These were converted to a human-readable POSIXct format using the as.POSIXct function. The division by 1000 adjusts the value from milliseconds to seconds. Specifying the time zone as "UTC" ensures consistency across all timestamp values.
 
 • Preparing Item Properties for Merging:
-To ensure that each item is represented by its latest property snapshot, the dataset was first sorted by itemid and timestamp. Then, using a grouping operation (via the group_by function from dplyr) the most recent record (i.e. the last row) for each itemid was kept. This step converts the original snapshot into a change log format, reducing redundancy and ensuring that only the most up-to-date item properties are retained.
+The item properties dataset, which contains multiple snapshots per item reflecting changes over time, was first sorted by itemid and timestamp to organise the snapshots chronologically. All snapshots were preserved so that the temporal evolution of item properties is retained rather than reducing the data to one row per item.
 
 • Preparing the Events Data for Merging:
-The cleaned events dataset was converted into a data.table and then sorted by itemid and timestamp to match the ordering in the item properties data. This step is essential for performing a left join.
+The cleaned events dataset was converted into a data.table and sorted by itemid and timestamp. This step aligns the events data with the ordering of the item properties and is essential for performing a left join with a rolling mechanism.
 
 • Merging the Datasets Using a left Join:
-A left join was performed to match each event with the most recent snapshot of the item properties that occurred before (or at) the time of the event. The join was executed on the itemid and timestamp columns with the roll = TRUE parameter. This ensures that for each event, the corresponding item properties are fetched based on the most recent prior snapshot.
+A left join was performed with the events file as the primary table. The join was executed on the itemid and timestamp columns with the roll = TRUE parameter. This approach ensures that every event is enriched with the most recent snapshot from the item properties that occurred before or at the time of the event, preserving all events while accurately reflecting the temporal context of each item property snapshot.
