@@ -258,7 +258,7 @@ Integrating conversion rates in the analysis is key, as it helps to to segment u
 
 Also tracking conversion rates can help you detect issues or improvements in your user funnel and overall system performance.
 
-Lastly, If there is a suspiscion of some users are bots, you might compare their conversion rates with genuine users to see if there are significant differences, which further validates the bot detection.
+Lastly, If there is a suspicion of some users are bots, you might compare their conversion rates with genuine users to see if there are significant differences, which further validates the bot detection.
 
 ```{r}
 # Count the number of each event per visitor
@@ -302,7 +302,7 @@ ggplot(user_event_counts, aes(x = conversion_view_to_add)) +
 ```{r}
 
  # --------------------------------------
-# Abnormally Detection
+# Anomaly Detection
 # --------------------------------------
 
 # setnames
@@ -701,17 +701,72 @@ item_properties <- do.call(rbind, c(item_properties_1, item_properties_2))
 item_properties$timestamp <- as.POSIXct(item_properties$timestamp / 1000, origin = "1970-01-01", tz = "UTC")
 ```
 
+**Merging cleaned_events and item_properties**
+
+```{r}
+# Merging datasets
+# Perform a left Join
+# A left join allows you to match each event with the most recent (previous) item property snapshot.
+
+# Set event to data.table
+setDT(cleaned_events)
+setDT(item_properties)
+
+# Order the data by itemid and timestamp
+setorder(cleaned_events, itemid, timestamp)
+setorder(item_properties, itemid, timestamp)
+
+# leftjoin: for each event, get the most recent snapshot from item properties.
+# This matches on 'itemid' and finds the snapshot with a timestamp less than or equal to the event timestamp.
+events_items<- item_properties[cleaned_events, on = .(itemid, timestamp), roll = TRUE]
+```
+
+**Replace the categoryid in the property column with it corresponding value**
+
+```{r}
+
+# Update the 'property' column in events_items
+# events_items[property == "categoryid", property := value]
+
+# In the events_items data frame, update the 'property' column.
+# For rows where 'property' equals "categoryid", replace it with the corresponding value from the 'value' column.
+# Otherwise, keep the original 'property' value.
+events_items <- events_items %>%
+  mutate(property = if_else(property == "categoryid", 
+                            value,     # Use the hashed value from 'value' column if property is "categoryid"
+                            property)) # Otherwise, keep the original property
+
+# Display the first few rows to verify the changes
+head(events_items)
+
+```
+
+**Pivot the data for the unique property to become columns**
+
+```{r}
+# Pivot the data from long to wide format.
+# 'names_from = property' creates new columns for each unique property.
+# 'values_from = value' populates these new columns with the corresponding values.
+# events_items<- events_items %>%
+#  pivot_wider(names_from = property, values_from = value)
+
+# events_items <- events_items %>%
+#  pivot_wider(names_from = property,
+#              values_from = value,
+#              values_fn = first)
+```
+
 ```{r}
 # 1. Keep only the latest property value for each item
 # Sort by 'itemid' and 'timestamp', then group by itemid and keep the lastest row
-item_properties <- item_properties %>%
+item_props <- item_properties %>%
   arrange(itemid, timestamp) %>%
   group_by(itemid) %>%
   slice_tail(n = 1) %>%
   ungroup()
 
 # 2. Filter for category and availability properties
-item_properties_filtered <- item_properties %>%
+item_properties_filtered <- item_props %>%
   filter(property %in% c("categoryid", "available"))
 
 # 3. Restructure or pivot the data so that each item has its categoryid & available as separate columns
@@ -738,6 +793,7 @@ item_properties_restructure <- item_properties_restructure %>%
 # -----------------------------------------------------
 # Set event to data.table
 setDT(cleaned_events)
+setDT(item_properties_restructure)
 
 # Order the data by itemid and timestamp
 setorder(cleaned_events, itemid, timestamp)
@@ -747,7 +803,7 @@ setorder(item_properties_restructure, itemid, timestamp)
 setkey(cleaned_events, itemid, timestamp)
 setkey(item_properties_restructure, itemid, timestamp)
 
-merged_data <- cleaned_events[item_properties, on = .(itemid, timestamp), roll = TRUE]
+merged_data_events_itemprop <- cleaned_events[item_properties_restructure, on = .(itemid, timestamp), roll = TRUE]
 ```
 
 ```{r}
