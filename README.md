@@ -128,3 +128,20 @@ The category_tree.csv file outlines the hierarchical structure of item categorie
 • After ensuring that the dataset was free of duplicates, missing values and bot-generated noise, the cleaned data was exported as a new CSV file, serving as a reliable foundation for further analysis.
 
 • Once cleaned and standardised, the dataset was exported as a new CSV file.
+
+#### Data Processing of Timestamp and Merging Item Properties
+
+• Binding Item Properties Files:
+The two parts of the item properties file (part 1 and part 2) were combined into a single data frame. A read-in-chunk approach was applied earlier to manage large files. The code uses the do.call function along with rbind to concatenate the two lists of item property data into one unified dataset.
+
+• Timestamp Conversion:
+Timestamps in the item properties dataset were originally in Unix time (milliseconds since the epoch). These were converted to a human-readable POSIXct format using the as.POSIXct function. The division by 1000 adjusts the value from milliseconds to seconds. Specifying the time zone as "UTC" ensures consistency across all timestamp values.
+
+• Preparing Item Properties for Merging:
+To ensure that each item is represented by its latest property snapshot, the dataset was first sorted by itemid and timestamp. Then, using a grouping operation (via the group_by function from dplyr) the most recent record (i.e. the last row) for each itemid was kept. This step converts the original snapshot into a change log format, reducing redundancy and ensuring that only the most up-to-date item properties are retained.
+
+• Preparing the Events Data for Merging:
+The cleaned events dataset was converted into a data.table and then sorted by itemid and timestamp to match the ordering in the item properties data. This step is essential for performing a left join.
+
+• Merging the Datasets Using a left Join:
+A left join was performed to match each event with the most recent snapshot of the item properties that occurred before (or at) the time of the event. The join was executed on the itemid and timestamp columns with the roll = TRUE parameter. This ensures that for each event, the corresponding item properties are fetched based on the most recent prior snapshot.
