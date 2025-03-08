@@ -140,6 +140,7 @@ Timestamps in the item properties dataset were originally in Unix time (millisec
 • Preparing Item Properties for Merging:
 The item properties dataset, which contains multiple snapshots per item reflecting changes over time, was first sorted by itemid and timestamp to organise the snapshots chronologically. All snapshots were preserved so that the temporal evolution of item properties is retained rather than reducing the data to one row per item.
 
+### Merging cleaned events dataset and item properties dataset
 • Preparing the Events Data for Merging:
 The cleaned events dataset was converted into a data.table and sorted by itemid and timestamp. This step aligns the events data with the ordering of the item properties and is essential for performing a left join with a rolling mechanism.
 
