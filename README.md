@@ -103,7 +103,7 @@ This file contains 20,275,902 rows, representing various properties of 417,053 u
 The category_tree.csv file outlines the hierarchical structure of item categories. It provides a category-based organisation of the products, which can help in grouping items into broader categories or subcategories. This file is important for building models that recommend items within specific categories or using category-based clustering for recommendations.
 
 ### 3. Data Preparation: 
-#### a. Event file
+#### a. Data Processing of Event file
 • To ensure the dataset was ready for analysis, a meticulous data preparation process was carried out as follows:
 
 • The events file was read using a read-in-chunk function. This function enables large files to be loaded in smaller manageable portions, thereby preventing memory overload and ensuring efficiency. The chunks were then bound into a single data frame.
@@ -117,7 +117,7 @@ The category_tree.csv file outlines the hierarchical structure of item categorie
 • The dataset was sorted chronologically by visitorid and timestamp. This ordering was crucial for computing time differences between consecutive events for each visitor. The shift function in data.table was used to calculate these differences in seconds. Naturally, the first event for each visitor resulted in an NA value since no preceding event existed. Negative time differences or other anomalies were checked to ensure data integrity.
 
 
-##### Bot Detection and Removal
+##### b. Bot Detection and Removal
 
 • A rule-based approach was employed to identify potential bots by flagging visitors with total event counts in the top 5% or average time differences in the bottom 5%.
 
@@ -129,7 +129,7 @@ The category_tree.csv file outlines the hierarchical structure of item categorie
 
 • Once cleaned and standardised, the dataset was exported as a new CSV file.
 
-#### Data Processing of Timestamp and Merging Item Properties
+#### c. Data Processing of Timestamp and Merging Item Properties
 
 • Binding Item Properties Files:
 The two parts of the item properties file (part 1 and part 2) were combined into a single data frame. A read-in-chunk approach was applied earlier to manage large files. The code uses the do.call function along with rbind to concatenate the two lists of item property data into one unified dataset.
@@ -140,9 +140,14 @@ Timestamps in the item properties dataset were originally in Unix time (millisec
 • Preparing Item Properties for Merging:
 The item properties dataset, which contains multiple snapshots per item reflecting changes over time, was first sorted by itemid and timestamp to organise the snapshots chronologically. All snapshots were preserved so that the temporal evolution of item properties is retained rather than reducing the data to one row per item.
 
-### Merging cleaned events dataset and item properties dataset
+#### d. Merging cleaned events dataset and item properties dataset
 • Preparing the Events Data for Merging:
 The cleaned events dataset was converted into a data.table and sorted by itemid and timestamp. This step aligns the events data with the ordering of the item properties and is essential for performing a left join with a rolling mechanism.
 
 • Merging the Datasets Using a left Join:
 A left join was performed with the events file as the primary table. The join was executed on the itemid and timestamp columns with the roll = TRUE parameter. This approach ensures that every event is enriched with the most recent snapshot from the item properties that occurred before or at the time of the event, preserving all events while accurately reflecting the temporal context of each item property snapshot.
+
+#### e. Data Processing of Category Tree: 
+The category tree dataset was carefully cleaned to ensure its integrity before merging it with other datasets.
+
+• Handling Missing Values in parentid: The parentid column contained 25 missing values. Since parentid represents hierarchical relationships between categories, imputing missing values was necessary. The median value of the parentid column was computed and used to replace the missing values. This approach helps maintain the categorical structure while minimising bias.
