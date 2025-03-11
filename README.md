@@ -228,7 +228,7 @@ The drop in addtocart events indicates that user engagement might be lower than 
 
 The 75.9% reduction means that bots contributed heavily to transaction counts, but the remaining transactions after bot removal are likely more reliable as genuine human activity. This makes transactions a more trustworthy metric for evaluating real user behaviour, even though the absolute drop was large.
 
-##### Visualising the Top 10 Most Viewed Products
+##### Visualising the Top 10 Most Viewed Products and Top 10 Most Purchased Products
 ![Image](https://github.com/user-attachments/assets/0fd3bc57-c985-4e7f-83f8-f54df70141cb)
 
 The bar chart titled "Top 10 Most Viewed Products" provides insights into product popularity based on view counts. 
