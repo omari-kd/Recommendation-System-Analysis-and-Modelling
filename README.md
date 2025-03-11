@@ -86,7 +86,7 @@ The dataset consists of three files: events.csv, item_properties.csv and categor
 
 2.1 Behaviour Data (events.csv)
 
-The behaviour data includes a total of 2,756,101 events, with 2,664,312 views, 69,332 add-to-cart actions and 22,457 transactions, recorded from 1,407,580 unique visitors. Each event corresponds to one of three types of interactions: "view", "addtocart", or "transaction". These implicit feedback signals are crucial for recommender systems:
+The behaviour data includes a total of 2,756,101 events, with 2,664,312 views, 69,332 add-to-cart actions and 22,457 transactions, recorded from 1,407,580 unique visitors. Each event corresponds to one of three types of interactions: "view", "addtocart" or "transaction". These implicit feedback signals are crucial for recommender systems:
 
 View: Represents a user showing interest in an item.
 
@@ -96,7 +96,7 @@ Transaction: Represents a completed purchase.
 
 2.2 Item Properties (item_properties.csv)
 
-This file contains 20,275,902 rows, representing various properties of 417,053 unique items. Each property may change over time (e.g., price updates), with each row capturing a snapshot of an item’s property at a specific timestamp. For items with constant properties, only a single snapshot is recorded. The file is split into two due to its size, and it contains detailed item information, which is essential for building item profiles and understanding how item properties influence user behaviour.
+This file contains 20,275,902 rows, representing various properties of 417,053 unique items. Each property may change over time (e.g., price updates), with each row capturing a snapshot of an item’s property at a specific timestamp. For items with constant properties, only a single snapshot is recorded. The file is split into two due to its size and it contains detailed item information, which is essential for building item profiles and understanding how item properties influence user behaviour.
 
 2.3 Category Tree (category_tree.csv)
 
