@@ -138,7 +138,7 @@ The two parts of the item properties file (part 1 and part 2) were combined into
 Timestamps in the item properties dataset were originally in Unix time (milliseconds since the epoch). These were converted to a human-readable POSIXct format using the as.POSIXct function. The division by 1000 adjusts the value from milliseconds to seconds. Specifying the time zone as "UTC" ensures consistency across all timestamp values.
 
 • Preparing Item Properties for Merging:
-The item properties dataset, which contains multiple snapshots per item reflecting changes over time, was first sorted by itemid and timestamp to organise the snapshots chronologically. All snapshots were preserved so that the temporal evolution of item properties is retained rather than reducing the data to one row per item.
+The item properties dataset, which contains multiple snapshots per item reflecting changes over time, was first sorted by itemid and timestamp to organise the snapshots chronologically. All snapshots were preserved to retain the temporal evolution of item properties rather than reducing the data to one row per item.
 
 #### d. Merging cleaned events dataset and item properties dataset
 • Preparing the Events Data for Merging:
@@ -148,6 +148,15 @@ The cleaned events dataset was converted into a data.table and sorted by itemid 
 A left join was performed with the events file as the primary table. The join was executed on the itemid and timestamp columns with the roll = TRUE parameter. This approach ensures that every event is enriched with the most recent snapshot from the item properties that occurred before or at the time of the event, preserving all events while accurately reflecting the temporal context of each item property snapshot.
 
 #### e. Data Processing of Category Tree: 
-The category tree dataset was carefully cleaned to ensure its integrity before merging it with other datasets.
+The category tree dataset was carefully cleaned to ensure its integrity before merging with other datasets.
 
 • Handling Missing Values in parentid: The parentid column contained 25 missing values. Since parentid represents hierarchical relationships between categories, imputing missing values was necessary. The median value of the parentid column was computed and used to replace the missing values. This approach helps maintain the categorical structure while minimising bias.
+
+### Final Merge 
+To enrich the events_items dataset with category information, a left join was performed with the categorytree dataset. This ensures that all event records are retained while relevant category details are appended.
+
+• Ensuring Data Type Consistency:
+The property column in events_items and the categoryid column in categorytree were converted to character type to prevent mismatches.
+
+• Merging the Datasets: 
+A left join was executed, matching the property column from events_items with the categoryid column from categorytree. This operation retains all records in events_items and adds category details where available.
