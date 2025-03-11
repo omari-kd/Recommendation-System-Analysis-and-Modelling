@@ -160,3 +160,96 @@ The property column in events_items and the categoryid column in categorytree we
 
 • Merging the Datasets: 
 A left join was executed, matching the property column from events_items with the categoryid column from categorytree. This operation retains all records in events_items and adds category details where available.
+
+### 4. Exploratory Data Analysis:
+##### Visualising the Distribution of User Events
+![Image](https://github.com/user-attachments/assets/83faf016-633e-40ba-a25e-7466bf05f9b2)
+
+The chart above visualises the distribution of user events, addtocarts, transaction, view.
+
+A. View Events: The view event category has the highest count by significant margin, with a total of 2,644, 218 events. This suggests visitors are viewing items on the platform.
+
+B. Add to Cart Events: There are 68,966 events where visitors or users have added items to their cart. This is a positive sign as it indicates user interest in purchasing, although the number is much lower compared to the events.
+
+C. Transaction Events: This category has the lowest count with 22,457 events. This represents the number of completed transactions, which is a critical metric for revenue generation.
+
+Analysis:
+
+The large number of view events compared to add to carts and transaction events suggest that there might be a drop-off in the conversion funnel (A conversion funnel, also known as a sales funnel or marketing funnel, is a visual representation of the customer journey from the first point of contact with a business to the final purchase or desired action. It's a model used to understand how potential customers move through different stages towards conversion, which is typically a sale but can also be any other desired action like signing up for a newsletter, downloading a whitepaper, purchasing product, et.) 
+Users are viewing content but not as many are proceeding to add items to cart or complete transactions.
+
+The ratio of view to transaction events is quite high. This could indicate that there are barriers to conversion, such as high prices, a poor user experience or lack of trust in the platform.
+
+The add to cart events are significantly higher than transactions, which is expected, but the gap is quite large. This could mean that users are adding items to their carts but not completing the purchase. Reasons could include abandoned carts, issues during the checkout process, or the user deciding against the purchase at the last moment.
+
+##### User Event Distribution Visualisation After Anomaly Removal
+![Image](https://github.com/user-attachments/assets/530dd63a-0381-4977-bd74-86fcee9b2e61)
+
+The charts show the distribution of user events after removing bots. The events tracked are 'view', 'addtocart' and 'transaction'.
+
+#### Key Findings:
+
+##### Views:
+
+Before bot removal: 2,664,218
+
+After bot removal: 1,817,072
+
+Drop: 847,146 (31.8% reduction)
+
+Implication: A significant portion of views were bot-generated, indicating inflated traffic metrics.
+
+##### Addtocart:
+
+Before bot removal: 68,966
+
+After bot removal: 22,947
+
+Drop: 46,019 (66.7% reduction)
+
+Implication: Bots contributed to addtocart actions, but less so compared to views.
+
+##### Transactions:
+
+Before bot removal: 22,457
+
+After bot removal: 5,392
+
+Drop: 17,065 (75.9% reduction)
+
+Implication: Transactions were less affected by bots, suggesting more genuine human actions.
+
+
+Analysis:
+
+The large drop in views suggests that the website's traffic was significantly inflated by bots, which could affect advertising revenue and perceived popularity.
+
+The drop in addtocart events indicates that user engagement might be lower than initially thought, suggesting a need to improve the user experience or product offerings.
+
+The 75.9% reduction means that bots contributed heavily to transaction counts, but the remaining transactions after bot removal are likely more reliable as genuine human activity. This makes transactions a more trustworthy metric for evaluating real user behaviour, even though the absolute drop was large.
+
+##### Visualising the Top 10 Most Viewed Products
+![Image](https://github.com/user-attachments/assets/0fd3bc57-c985-4e7f-83f8-f54df70141cb)
+
+The bar chart titled "Top 10 Most Viewed Products" provides insights into product popularity based on view counts. 
+
+Product 187946 dominates with over 3,000 views, far exceeding all other products.
+The remaining products have significantly fewer views, ranging from 1,000 to 2,000 views.
+
+![Image](https://github.com/user-attachments/assets/00b7e2d3-b2a4-4ac8-869b-8ed785a487a2)
+
+The bar chart titled "Top 10 Most Purchased Products" reveals key insights into product sales performance.
+
+Product 461686 leads with 24 purchases, followed closely by 7943 with 23 purchases.
+
+Products 48030, 312728, 213834, 17478 form a mid-tier group with 16–17 purchases each.
+
+These products are consistently popular but lag behind the top two.
+
+Products 268883, 416017, 409804, 441852 have 11–12 purchases suggesting lower engagement or appeal
+
+Analysis:
+
+Most Viewed Product (187946): over 3,000 views (from previous data), but not in the top purchased list, indicating a disconnect between interest and purchase.
+
+Top Purchased Products (461686, 7943): 24–23 purchases each, suggesting these items resonate strongly with buyers.
