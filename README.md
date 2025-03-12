@@ -4,7 +4,7 @@
 Recommendation systems are essential for delivering personalised user experiences across various platforms, including e-commerce, streaming services, social media and news websites.
 These systems leverage historical and user-specific data to generate recommendations, enhancing user satisfaction, engagement and conversion rates. From e-commerce platforms and streaming services to social media and news websites, recommendation systems are vital in shaping the user experience.
 
-The ability to provide personalised recommendations has significant business value. By understanding user preferences, behaviours and interactions, organisations can boost user retention, increase sales and improve customer satisfaction. As recommendation systems continue to evolve, they face the challenge of offering accurate, diverse and relevant suggestions while handling large volumes of data and maintaining real-time performance. 
+The ability to provide personalised recommendations has significant business value. Organisations can boost user retention, increase sales and improve customer satisfaction by understanding user preferences, behaviours and interactions. As recommendation systems evolve, they face the challenge of offering accurate, diverse and relevant suggestions while handling large volumes of data and maintaining real-time performance. 
 
 This project aims to develop a recommendation system that leverages historical user data to provide tailored recommendations across different domains, such as product recommendations, content suggestions and service optimisation.
 
@@ -79,6 +79,13 @@ g. Balance Accuracy & Diversity: Provide relevant but varied recommendations to 
 
 Analytic Questions:
 
+a. How effective is the user funnel?
+
+b. What are the trends in user activity over time
+
+c. 
+
+d. Is there a relationship between overall activity and conversion rates?
 
 ### 2. Data Understanding:
 
@@ -253,3 +260,31 @@ Analysis:
 Most Viewed Product (187946): over 3,000 views (from previous data), but not in the top purchased list, indicating a disconnect between interest and purchase.
 
 Top Purchased Products (461686, 7943): 24–23 purchases each, suggesting these items resonate strongly with buyers.
+
+
+### Answers to key analytic questions:
+
+#### How effective is the user funnel?
+![Image](https://github.com/user-attachments/assets/fbe4d5c5-8dee-4b06-9bb4-a8add94965af)
+
+The bar chart illustrates the user journey from viewing content to completing a transaction, revealing critical insights about user engagement and conversion rates. The x-axis represents the event types: view, addtocart and transaction. The y-axis represents the count of each event type. The bars are plotted in a way that shows a significant drop-off from views to addtocart, and then again from addtocart to transaction.
+
+#### View dominance:
+The "view" event has an extremely high count, indicating substantial initial interest or traffic. This suggests effective marketing in driving users to the platform or content.
+
+#### Significant drop-off to add-to-cart:
+There's a dramatic decrease from views to add-to-cart events. This indicates that while many users view content, only a small fraction take the next step of adding items to their cart.
+
+#### Further drop-off to transaction: 
+The transition from add-to-cart to transaction shows another substantial decrease. This suggests that even users who express purchase intent by adding items to their cart often don't complete the purchase.
+
+### Implications: 
+#### Cart Abandonment: 
+The gap between add-to-cart and transaction highlights a common e-commerce challenge: cart abandonment. Reasons might include: Unexpected costs (shipping, taxes), Complicated checkout process, Security concerns, Distractions or interruptions.
+
+#### User Experience Concerns:
+The large drop-off may suggest problems in the user interface or journey: Difficulty in navigating from viewing to purchasing, Complicated or lengthy add-to-cart process, Lack of clear calls-to-action.
+
+#### Funnel Efficiency: 
+The conversion rate from view to add-to-cart is extremely low, indicating potential issues in converting initial interest into concrete actions.
+
