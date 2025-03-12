@@ -81,7 +81,7 @@ Analytic Questions:
 
 a. How effective is the user funnel?
 
-b. What are the trends in user activity over time
+b. What are the trends in user activity over time?
 
 c. 
 
@@ -264,7 +264,7 @@ Top Purchased Products (461686, 7943): 24–23 purchases each, suggesting these 
 
 ### Answers to key analytic questions:
 
-#### How effective is the user funnel?
+### How effective is the user funnel?
 ![Image](https://github.com/user-attachments/assets/fbe4d5c5-8dee-4b06-9bb4-a8add94965af)
 
 The bar chart illustrates the user journey from viewing content to completing a transaction, revealing critical insights about user engagement and conversion rates. The x-axis represents the event types: view, addtocart and transaction. The y-axis represents the count of each event type. The bars are plotted in a way that shows a significant drop-off from views to addtocart, and then again from addtocart to transaction.
@@ -288,3 +288,42 @@ The large drop-off may suggest problems in the user interface or journey: Diffic
 #### Funnel Efficiency: 
 The conversion rate from view to add-to-cart is extremely low, indicating potential issues in converting initial interest into concrete actions.
 
+### What are the trends in user activity over time?
+![Image](https://github.com/user-attachments/assets/cb6d6534-3a73-40bb-80e2-4fdfab24d844)
+
+The chart shows daily total events from May through September, with the y-axis representing total events (up to 22,208) and the x-axis showing dates.
+
+#### Key Observations
+
+#### Overall Range:
+This time series visualization reveals several important patterns in user activity over time. Daily events fluctuate significantly, ranging from 1000 to 22,000 events per day. This substantial variation suggests user activity is influenced by multiple factors that change daily.
+
+#### Trend Analysis: 
+The latter part of the series (August-September) shows more pronounced fluctuations compared to earlier months. The final data point shows a significant drop to around 1000 events, which might indicate a recent change in user behavior or potential data collection issues.
+
+#### Potential Outliers: 
+Several days show unusually high spikes (over 20,000 events) that stand out from the general pattern. These could represent special events, marketing campaigns or system anomalies.
+
+### Implications:
+#### Recent Drop Investigation: 
+The significant decline near September requires investigation to determine if it represents:
+
+a. A genuine reduction in user interest.
+
+b. Technical issues affecting event tracking.
+
+c. Changes in user behavior following a platform update
+
+#### Marketing Effectiveness:
+The peaks may correlate with specific marketing initiatives, suggesting successful campaigns. The valleys could indicate opportunities for improved marketing strategies during traditionally slower periods.
+
+#### User Engagement Variability:
+The substantial daily fluctuations suggest user engagement is highly sensitive to external factors such as:
+
+a. Marketing campaigns
+
+b. Seasonal events
+
+c. Product updates
+
+d. External news or trends
