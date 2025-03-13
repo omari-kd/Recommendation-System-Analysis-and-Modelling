@@ -168,7 +168,7 @@ To enrich the events_items dataset with category information, a left join was pe
 The property column in events_items and the categoryid column in categorytree were converted to character type to prevent mismatches.
 
 • Merging the Datasets: 
-A left join was executed, matching the property column from events_items with the categoryid column from categorytree. This operation retains all records in events_items and adds category details where available.
+A left join was executed, matching the property column from events_items with the categoryid column from categorytree to form a merged_df. This operation retains all records in events_items and adds category details where available.
 
 • Ensuring 'Available' is a Separate Column and Merged into the Final Dataset:
 
@@ -187,7 +187,7 @@ d. Retaining Only the Latest Available Status:
 To avoid multiple records per item, the dataset was grouped by itemid, sorted in descending order by timestamp, and only the most recent available status was retained.
 
 e. Final Merge:
-The processed availability data was then merged back into the final merged dataset via a left join on itemid so that all records from the main dataset were retained and enriched with the latest availability information.
+The processed availability data was then merged back into the merged_df to form a final_df via a left join on itemid so that all records from the main dataset were retained and enriched with the latest availability information.
 
 ### 4. Exploratory Data Analysis:
 ##### Visualising the Distribution of User Events
