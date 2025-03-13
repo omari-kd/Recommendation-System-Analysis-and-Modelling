@@ -195,7 +195,7 @@ The processed availability data was then merged back into the merged_df to form 
 
 ### 4. Exploratory Data Analysis:
 ##### Visualising the Distribution of User Events
-![Image](https://github.com/user-attachments/assets/83faf016-633e-40ba-a25e-7466bf05f9b2)
+![Image](https://github.com/user-attachments/assets/48c3f9c8-694e-4625-a470-55409074bf3d)
 
 The chart above visualises the distribution of user events, addtocarts, transaction, view.
 
@@ -215,7 +215,7 @@ The ratio of view to transaction events is quite high. This could indicate that 
 The add to cart events are significantly higher than transactions, which is expected, but the gap is quite large. This could mean that users are adding items to their carts but not completing the purchase. Reasons could include abandoned carts, issues during the checkout process, or the user deciding against the purchase at the last moment.
 
 ##### User Event Distribution Visualisation After Anomaly Removal
-![Image](https://github.com/user-attachments/assets/530dd63a-0381-4977-bd74-86fcee9b2e61)
+![Image](https://github.com/user-attachments/assets/df651954-e8de-4038-92f9-fea191527f50)
 
 The charts show the distribution of user events after removing bots. The events tracked are 'view', 'addtocart' and 'transaction'.
 
