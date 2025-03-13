@@ -154,6 +154,8 @@ The cleaned events dataset was converted into a data.table and sorted by itemid 
 • Merging the Datasets Using a left Join:
 A left join was performed with the events file as the primary table. The join was executed on the itemid and timestamp columns with the roll = TRUE parameter. This approach ensures that every event is enriched with the most recent snapshot from the item properties that occurred before or at the time of the event, preserving all events while accurately reflecting the temporal context of each item property snapshot.
 
+In the left joined events_items dataset, the property column was updated to ensure that for rows where property equals "categoryid", the value in the value column replaces property. This step ensures consistency in how category information is stored.
+
 #### e. Data Processing of Category Tree: 
 The category tree dataset was carefully cleaned to ensure its integrity before merging with other datasets.
 
@@ -296,7 +298,7 @@ The chart shows daily total events from May through September, with the y-axis r
 #### Key Observations
 
 #### Overall Range:
-This time series visualization reveals several important patterns in user activity over time. Daily events fluctuate significantly, ranging from 1000 to 22,000 events per day. This substantial variation suggests user activity is influenced by multiple factors that change daily.
+This time series visualization reveals several vital patterns in user activity over time. Daily events fluctuate significantly, ranging from 1000 to 22,000 events per day. This substantial variation suggests user activity is influenced by multiple daily changes.
 
 #### Trend Analysis: 
 The latter part of the series (August-September) shows more pronounced fluctuations compared to earlier months. The final data point shows a significant drop to around 1000 events, which might indicate a recent change in user behavior or potential data collection issues.
