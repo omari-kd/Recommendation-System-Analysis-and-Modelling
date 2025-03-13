@@ -154,6 +154,8 @@ The cleaned events dataset was converted into a data.table and sorted by itemid 
 • Merging the Datasets Using a left Join:
 A left join was performed with the events file as the primary table. The join was executed on the itemid and timestamp columns with the roll = TRUE parameter. This approach ensures that every event is enriched with the most recent snapshot from the item properties that occurred before or at the time of the event, preserving all events while accurately reflecting the temporal context of each item property snapshot.
 
+• Columns "time_diff", "hour" and "weekday" from your merged_df 
+
 In the left joined events_items dataset, the property column was updated to ensure that for rows where property equals "categoryid", the value in the value column replaces property. This step ensures consistency in how category information is stored.
 
 #### e. Data Processing of Category Tree: 
