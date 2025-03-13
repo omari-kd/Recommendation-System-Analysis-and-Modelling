@@ -164,12 +164,14 @@ The category tree dataset was carefully cleaned to ensure its integrity before m
 ### Final Merge 
 To enrich the events_items dataset with category information, a left join was performed with the categorytree dataset. This ensures that all event records are retained while relevant category details are appended.
 
+#### Procedure: 
+
 • Ensuring Data Type Consistency:
 The property column in events_items and the categoryid column in categorytree were converted to character type to prevent mismatches.
 
 • Merging the Datasets: 
 A left join was executed, matching the property column from events_items with the categoryid column from categorytree to form a merged_df. This operation retains all records in events_items and adds category details where available.
-
+The final merge was saved as final_data
 • Ensuring 'Available' is a Separate Column and Merged into the Final Dataset:
 
 To correctly integrate the availability information into the final dataset, the following steps were performed:
