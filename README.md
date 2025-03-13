@@ -170,6 +170,25 @@ The property column in events_items and the categoryid column in categorytree we
 • Merging the Datasets: 
 A left join was executed, matching the property column from events_items with the categoryid column from categorytree. This operation retains all records in events_items and adds category details where available.
 
+• Ensuring 'Available' is a Separate Column and Merged into the Final Dataset:
+
+To correctly integrate the availability information into the final dataset, the following steps were performed:
+
+a. Filtering for Availability Properties:
+Rows where the property equals "available" were filtered from the merged dataset.
+
+b. Restructuring the Data:
+The filtered data was pivoted so that each item had its available status as a separate column. This step converts the long format into a wide format for the "available" property.
+
+c. Converting to Numeric and Integer:
+The available column was converted to numeric, with missing values replaced by 0, and then converted to integer (0 or 1).
+
+d. Retaining Only the Latest Available Status:
+To avoid multiple records per item, the dataset was grouped by itemid, sorted in descending order by timestamp, and only the most recent available status was retained.
+
+e. Final Merge:
+The processed availability data was then merged back into the final merged dataset via a left join on itemid so that all records from the main dataset were retained and enriched with the latest availability information.
+
 ### 4. Exploratory Data Analysis:
 ##### Visualising the Distribution of User Events
 ![Image](https://github.com/user-attachments/assets/83faf016-633e-40ba-a25e-7466bf05f9b2)
