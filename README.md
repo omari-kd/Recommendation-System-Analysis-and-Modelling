@@ -87,6 +87,8 @@ c.
 
 d. Is there a relationship between overall activity and conversion rates?
 
+e. When are users most active?
+
 ### 2. Data Understanding:
 
 The dataset consists of three files: events.csv, item_properties.csv and category_tree.csv, which collectively describe the interactions and properties of items on an e-commerce website. The data, collected over months, is raw and contains hashed values due to confidentiality concerns. The goal of publishing this dataset is to support research in recommender systems using implicit feedback.
@@ -363,6 +365,38 @@ c. Product updates
 
 d. External news or trends
 
+### When are users most active?
+![Image](https://github.com/user-attachments/assets/66d962a4-cfc1-4b83-ab65-938c8afd6d99)
+
+The heatmap shows event counts across different hours of the day and weekdays. 
+
+Key Observations:
+
+#### Peak Activity Periods:
+- User activity peaks in the late afternoon to evening hours (15:00 - 21:00).
+- The highest concentration of events occurs between 17:00 and 20:00 across most weekdays
+- Early morning (0:00 - 6:00) shows consistently low activity.
+
+#### Day Patterns
+- Early morning shows consistently low activity.
+- Mid-morning to early afternoon has no activity.
+- Evening hours display the highest activity levels.
+
+#### Weekday Differences:
+- Saturday evenings appear to have sustained low activity.
+- Monday through Thursday show similar patterns with peak activity in the late afternoon/evening.
+
+#### Implications:
+
+Marketing Timing: 
+- Avoid sending important communications during low-activity periods when users are less likely to engage.
+- Time-sensitive promotions or notifications would be most effective during peak activity periods.
+
+Content Scheduling: New content or features should be launched during peak times to maximize immediate engagement.
+
+User Experience: 
+- Ensure platform performance is optimized during high-traffic periods to prevent slowdowns.
+- 
 
 ## Modelling
 
@@ -427,3 +461,10 @@ b. Correlate with External Factors:
 
 c. Implement Real-Time Monitoring:
 - Create dashboards to monitor key metrics in real-time
+
+### User Activity Analysis: 
+Implement Time-Based Strategies:
+- Create targeted marketing campaigns that align with peak activity windows.
+- Develop special weekend promotions to leverage Saturday and Sunday engagement patterns.
+
+Analyse Event Types: Identify if certain activities peak at different times than others.
