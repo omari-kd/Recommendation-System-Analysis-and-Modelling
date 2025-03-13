@@ -157,12 +157,14 @@ A left join was performed with the events file as the primary table. The join wa
 In the left joined events_items dataset, the property column was updated to ensure that for rows where property equals "categoryid", the value in the value column replaces property. This step ensures consistency in how category information is stored.
 
 #### e. Data Processing of Category Tree: 
-The category tree dataset was carefully cleaned to ensure its integrity before merging with other datasets.
+The category_tree dataset was carefully cleaned to ensure its integrity before merging with other datasets.
+
+• There were no duplicates in the category_tree dataset
 
 • Handling Missing Values in parentid: The parentid column contained 25 missing values. Since parentid represents hierarchical relationships between categories, imputing missing values was necessary. The median value of the parentid column was computed and used to replace the missing values. This approach helps maintain the categorical structure while minimising bias.
 
 ### Final Merge 
-To enrich the events_items dataset with category information, a left join was performed with the categorytree dataset. This ensures that all event records are retained while relevant category details are appended.
+To enrich the events_items dataset with category information, a left join was performed with the category_tree dataset. This ensures that all event records are retained while relevant category details are appended.
 
 #### Procedure: 
 
@@ -170,7 +172,7 @@ To enrich the events_items dataset with category information, a left join was pe
 The property column in events_items and the categoryid column in category_tree were converted to character type to prevent mismatches.
 
 • Merging the Datasets: 
-A left join was executed, matching the property column from events_items with the categoryid column from categorytree to form a merged_df. This operation retains all records in events_items and adds category details where available.
+A left join was executed, matching the property column from events_items with the categoryid column from category_tree to form a merged_df. This operation retains all records in events_items and adds category details where available.
 The final merge was saved as final_data
 • Ensuring 'Available' is a Separate Column and Merged into the Final Dataset:
 
