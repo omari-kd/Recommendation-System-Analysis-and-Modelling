@@ -260,6 +260,8 @@ The drop in addtocart events indicates that user engagement might be lower than 
 
 The 75.9% reduction means that bots contributed heavily to transaction counts, but the remaining transactions after bot removal are likely more reliable as genuine human activity. This makes transactions a more trustworthy metric for evaluating real user behaviour, even though the absolute drop was large.
 
+
+
 ##### Visualising the Top 10 Most Viewed Products and Top 10 Most Purchased Products
 ![Image](https://github.com/user-attachments/assets/0fd3bc57-c985-4e7f-83f8-f54df70141cb)
 
@@ -313,9 +315,11 @@ The gap between add-to-cart and transaction highlights a common e-commerce chall
 The large drop-off may suggest problems in the user interface or journey: Difficulty in navigating from viewing to purchasing, Complicated or lengthy add-to-cart process, Lack of clear calls-to-action.
 
 #### Funnel Efficiency: 
-The conversion rate from view to add-to-cart is extremely low, indicating potential issues in converting initial interest into concrete actions.
+The conversPost-bot removal, the data provides a clearer picture of real user behavior. While views remain high, the conversion funnel highlights opportunities to improve engagement and revenue by focusing on genuine user interactionsion rate from view to add-to-cart is extremely low, indicating potential issues in converting initial interest into concrete actions.
 
 The current funnel suggests opportunities for significant improvement in conversion rates. Even small percentage improvements could yield substantial results given the high volume of views
+
+Post-bot removal, the data provides a clearer picture of real user behavior. While views remain high, the conversion funnel highlights opportunities to improve engagement and revenue by focusing on genuine user interactions
 
 ### What are the trends in user activity over time?
 ![Image](https://github.com/user-attachments/assets/b29b8f56-2d67-4eaa-a26a-cd579ac9671e)
