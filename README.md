@@ -286,6 +286,8 @@ Most Viewed Product (187946): over 3,000 views (from previous data), but not in 
 
 Top Purchased Products (461686, 7943): 24–23 purchases each, suggesting these items resonate strongly with buyers.
 
+Product 187946 may need optimization (pricing, descriptions or checkout flow) to convert viewers into buyers. Top purchased products could be leveraged for cross-selling or inventory prioritization.
+
 
 ### Answers to key analytic questions:
 
@@ -313,15 +315,17 @@ The large drop-off may suggest problems in the user interface or journey: Diffic
 #### Funnel Efficiency: 
 The conversion rate from view to add-to-cart is extremely low, indicating potential issues in converting initial interest into concrete actions.
 
+The current funnel suggests opportunities for significant improvement in conversion rates. Even small percentage improvements could yield substantial results given the high volume of views
+
 ### What are the trends in user activity over time?
 ![Image](https://github.com/user-attachments/assets/cb6d6534-3a73-40bb-80e2-4fdfab24d844)
 
-The chart shows daily total events from May through September, with the y-axis representing total events (up to 22,208) and the x-axis showing dates.
+The chart shows monthly total events from May through September, with the y-axis representing total events (up to 22,208) and the x-axis showing dates.
 
 #### Key Observations
 
 #### Overall Range:
-This time series visualization reveals several vital patterns in user activity over time. Daily events fluctuate significantly, ranging from 1000 to 22,000 events per day. This substantial variation suggests user activity is influenced by multiple daily changes.
+This time series visualization reveals several vital patterns in user activity over time. Monthly events fluctuate significantly, ranging from 1000 to 22,000 events per day. This substantial variation suggests user activity is influenced by multiple daily changes.
 
 #### Trend Analysis: 
 The latter part of the series (August-September) shows more pronounced fluctuations compared to earlier months. The final data point shows a significant drop to around 1000 events, which might indicate a recent change in user behavior or potential data collection issues.
@@ -352,3 +356,67 @@ b. Seasonal events
 c. Product updates
 
 d. External news or trends
+
+
+## Modelling
+
+
+## Evaluation
+
+
+## Recommendations From The Top Purchased Products and Viewed Products)
+
+#### 1. Optimize High-View Products: 
+
+Improve descriptions, images or pricing for product 187946 to boost conversions.
+
+#### 2. Engage Infrequent Users: 
+
+Use targeted campaigns (discounts, personalized recommendations) to re-activate users with low engagement.
+
+
+## Recommendations From The Conversion Funnel Analysis
+#### 1. Optimize Conversion Pathways: 
+a. Simplify the process from viewing to adding to cart
+
+b. Implement clear, prominent calls-to-action
+
+c. Ensure mobile-friendly design
+
+d. Focus on the add-to-cart stage as a critical leverage point for increasing transactions
+
+#### 2. Address Cart Abandonment:
+a. Implement cart abandonment email campaigns
+
+b. Offer incentives for completing purchases
+
+c. Provide multiple payment options
+
+d. Display trust signals during checkout
+
+#### 3. Personalization:
+a. Use data to personalize recommendations
+
+b. Show relevant products based on user behavior
+
+c. Implement dynamic pricing or special offers.
+
+### Strategic Considerations
+The current funnel suggests opportunities for significant improvement in conversion rates. Even small percentage improvements could yield substantial results given the high volume of views. Focus on the add-to-cart stage as a critical leverage point for increasing transactions. 
+
+#### 4. Analytics and Testing:
+a. Gather user feedback to identify specific pain points
+
+## Recommendations From The Monthly Total Events Analysis:
+a. Investigate Recent Decline:
+- Determine the cause of the recent drop in events
+- Check for technical issues in event tracking
+- Review recent platform changes that might affect user behavior
+- Analyse user feedback for potential concerns
+
+b. Correlate with External Factors:
+- Overlay marketing campaigns, product launches and external events on the time series to identify drivers of peaks and valleys.
+- Analyse how specific initiatives impact user engagement.
+
+c. Implement Real-Time Monitoring:
+- Create dashboards to monitor key metrics in real-time
