@@ -83,11 +83,15 @@ a. How effective is the user funnel?
 
 b. What are the trends in user activity over time?
 
-c. 
+c. When are users most active?
 
-d. Is there a relationship between overall activity and conversion rates?
+d. How does the availability of items impact user interactions?
 
-e. When are users most active?
+e. How do conversion rates vary across different times of the day?
+
+f.
+
+g.
 
 ### 2. Data Understanding:
 
@@ -396,7 +400,40 @@ Content Scheduling: New content or features should be launched during peak times
 
 User Experience: 
 - Ensure platform performance is optimized during high-traffic periods to prevent slowdowns.
-- 
+
+
+### How does the availability of items impact user interactions?
+![Image](https://github.com/user-attachments/assets/bdd9b61e-6f4f-4fc6-9388-a2b457e29ba3)
+
+This bar chart compares user interactions with available versus unavailable items across three key event types: views, add-to-carts and transactions.
+
+#### Key Observations:
+
+Views: 
+- Available items receive dramatically more views than unavailable items.
+- The green bar (available) is significantly taller than the red bar (unavailable), indicating users are much more likely to view available items.
+
+Add-to-Cart: 
+- Available items also show higher add-to-cart events compared to unavailable items.
+- While the difference is less pronounced than with views, there's still a clear preference for adding available items to carts.
+
+Transactions:
+- Transactions for unavailable items are extremely rare, nearly non-existent.
+- The red bar for transactions is barely visible, showing minimal purchases of unavailable items.
+
+Implications: 
+
+User Behavior:
+- Users strongly prefer interacting with available items at every stage of the conversion funnel.
+- Unavailable items generate minimal engagement beyond initial views, with virtually no conversions.
+
+Inventory Management:
+- Ensuring item availability is critical for driving user engagement and conversions.
+- Stockouts significantly reduce opportunities for both add-to-carts and transactions.
+
+User Experience: 
+- Displaying unavailable items may frustrate users who attempt to purchase them.
+- The presence of unavailable items in search results or recommendations might negatively impact the overall experience.
 
 ## Modelling
 
@@ -468,3 +505,9 @@ Implement Time-Based Strategies:
 - Develop special weekend promotions to leverage Saturday and Sunday engagement patterns.
 
 Analyse Event Types: Identify if certain activities peak at different times than others.
+
+### User Interactions on Items Availability Analysis:
+- Prioritise displaying available items in search results and recommendations.
+- Consider removing or deprioritising unavailable items from user-facing interfaces.
+- For unavailable items, provide clear messaging about restock dates or alternatives for user communication.
+- Implement notification systems for when unavailable items become available again.
