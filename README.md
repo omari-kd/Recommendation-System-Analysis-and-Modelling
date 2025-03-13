@@ -364,7 +364,8 @@ d. External news or trends
 ## Evaluation
 
 
-## Recommendations From The Top Purchased Products and Viewed Products)
+## Recommendations 
+### The Top Purchased Products and Viewed Products
 
 #### 1. Optimize High-View Products: 
 
@@ -375,7 +376,7 @@ Improve descriptions, images or pricing for product 187946 to boost conversions.
 Use targeted campaigns (discounts, personalized recommendations) to re-activate users with low engagement.
 
 
-## Recommendations From The Conversion Funnel Analysis
+### The User Funnel Analysis
 #### 1. Optimize Conversion Pathways: 
 a. Simplify the process from viewing to adding to cart
 
@@ -407,7 +408,7 @@ The current funnel suggests opportunities for significant improvement in convers
 #### 4. Analytics and Testing:
 a. Gather user feedback to identify specific pain points
 
-## Recommendations From The Monthly Total Events Analysis:
+### Monthly Total Events Analysis:
 a. Investigate Recent Decline:
 - Determine the cause of the recent drop in events
 - Check for technical issues in event tracking
