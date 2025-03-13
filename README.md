@@ -318,7 +318,7 @@ The conversion rate from view to add-to-cart is extremely low, indicating potent
 The current funnel suggests opportunities for significant improvement in conversion rates. Even small percentage improvements could yield substantial results given the high volume of views
 
 ### What are the trends in user activity over time?
-![Image](https://github.com/user-attachments/assets/cb6d6534-3a73-40bb-80e2-4fdfab24d844)
+![Image](https://github.com/user-attachments/assets/b29b8f56-2d67-4eaa-a26a-cd579ac9671e)
 
 The chart shows monthly total events from May through September, with the y-axis representing total events (up to 22,208) and the x-axis showing dates.
 
