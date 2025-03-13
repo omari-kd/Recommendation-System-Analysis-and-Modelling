@@ -167,7 +167,7 @@ To enrich the events_items dataset with category information, a left join was pe
 #### Procedure: 
 
 • Ensuring Data Type Consistency:
-The property column in events_items and the categoryid column in categorytree were converted to character type to prevent mismatches.
+The property column in events_items and the categoryid column in category_tree were converted to character type to prevent mismatches.
 
 • Merging the Datasets: 
 A left join was executed, matching the property column from events_items with the categoryid column from categorytree to form a merged_df. This operation retains all records in events_items and adds category details where available.
