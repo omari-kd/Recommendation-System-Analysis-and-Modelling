@@ -1,82 +1,5 @@
----
-title: "Recommendation System Analysis and Modelling"
-author: "Omari Ebenezer"
-output: html_notebook
----
 
-------------------------------------------------------------------------
 
-> ::: {#overview style="text-align: justify"}
-> # **Introduction**
->
-> Recommendation systems are essential for delivering personalised user experiences across a variety of platforms, including e-commerce, streaming services, social media and news websites.
->
-> This project aims to develop a recommendation system that leveraged historical user data to provide tailored recommendations across different domains, such as product recommendations, content suggestions and service optimisation.
->
-> ## **CRISP DM Framework**
->
-> The analysis followed the CRISP-DM methodology, which includes the following stages:
->
-> ### **1. Business Understanding:**
->
-> The objectives were defined below, followed by the formulation of analytic questions to guide the modelling process.
->
-> Key objectives of the project include:
->
-> 1.Develop Personalized Recommendations: Tailor suggestions based on user behaviour and past interactions.
->
-> 2.Address Diverse Use Cases: Implement systems for product, content and service recommendations.
->
-> 3.Utilize Historical Data: Leverage past user actions to make accurate predictions.
->
-> 4.Enhance User Engagement: Improve user satisfaction and retention through relevant suggestions.
->
-> 5.Ensure Scalability & Real-Time Performance: Handle large data volumes and provide recommendations promptly.
->
-> 6.Boost Business Metrics: Increase sales and conversion rates through better user personalization.
->
-> 7.Balance Accuracy & Diversity: Provide relevant but varied recommendations to avoid monotony.
->
-> \
-> Analytic Questions:\
-> a. How effective is the user funnel?
->
-> b\. What are the trends in user activity over time?
->
-> c\. When are users most active?
->
-> d\. How does the availability of items impact user interactions?
->
-> e\. How do conversion rates vary across different times of the day?
->
-> f\. What is the relationship between user session duration and purchase likelihood?
->
-> g\. What is the distribution of event types across all users?
->
-> ### **2. Data Understanding:**
->
-> The dataset consists of three files: events.csv, item_properties.csv and category_tree.csv, which collectively describe the interactions and properties of items on an e-commerce website. The data, collected over a 4.5-month period, is raw and contains hashed values due to confidentiality concerns. The goal of publishing this dataset is to support research in recommender systems using implicit feedback.
->
-> 2.1 Behaviour Data (events.csv)
->
-> The behaviour data includes a total of 2,756,101 events, with 2,664,312 views, 69,332 add-to-cart actions, and 22,457 transactions, recorded from 1,407,580 unique visitors. Each event corresponds to one of three types of interactions: "view", "addtocart", or "transaction". These implicit feedback signals are crucial for recommender systems:
->
-> View: Represents a user showing interest in an item.
->
-> Add to Cart: Indicates a higher level of intent to purchase.
->
-> Transaction: Represents a completed purchase.
->
-> 2.2 Item Properties (item_properties.csv)
->
-> This file contains 20,275,902 rows, representing various properties of 417,053 unique items. Each property may change over time (e.g., price updates), with each row capturing a snapshot of an item’s property at a specific timestamp. For items with constant properties, only a single snapshot is recorded. The file is split into two due to its size, and it contains detailed item information, which is essential for building item profiles and understanding how item properties influence user behaviour.
->
-> 2.3 Category Tree (category_tree.csv)
-> :::
-
-### **3. Data Preparation:**
-
-```{r}
 # ----------------------------
 # Load libraries
 # ----------------------------
@@ -90,9 +13,8 @@ library(reshape2)
 library(scales)
 library(lubridate)
 library(isotree)  
-```
 
-```{r}
+
 # -------------------------------------
 # Chunk Function
 # -------------------------------------
@@ -131,46 +53,33 @@ read_in_chunks <- function(file_path, chunk_size = 10000, ...) {
   
   return(chunks)
 }
-```
 
-```{r}
+
 # Read category tree.csv
 category_tree <- fread("./00_raw_data/category_tree.csv")
-```
 
-```{r}
+
 # Read events.csv in chunks
 events <- read_in_chunks("./00_raw_data/events.csv")
-```
 
-```{r}
 # Read item_properties_part1.1.csv in chunks
 item_properties_1 <- read_in_chunks("./00_raw_data/item_properties_part1.1.csv")
-```
 
-```{r}
 # Read item_properties_part2.csv in chunks
 item_properties_2 <- read_in_chunks("./00_raw_data/item_properties_part2.csv")
-```
 
-```{r}
-# Concatenate the two item_properties 
-# item_properites <- c(item_properties_1, item_properties_2)
-```
 
-> **Data Preprocessing for category_tree**
+# ------------------------------------------------
+# Data Preprocessing for the category tree
+# ------------------------------------------------
 
-```{r}
 # Check for duplicates and clean column names
 sum(duplicated(category_tree))
-```
 
-```{r}
+
 # Check for NA's 
 colSums(is.na(category_tree) | category_tree == "")
-```
 
-```{r}
 # Replace the NA's in the parentid with the median
 median_parentid <- median(category_tree$parentid, na.rm = T)
 median_parentid
@@ -180,23 +89,28 @@ category_tree <- category_tree %>%
   mutate(parentid = ifelse(is.na(parentid), median_parentid, parentid))
 
 # Verify changes
-sum(is.na(category_tree$parentid))
-  
-```
+sum(is.na(category_tree$parentid))# Replace the NA's in the parentid with the median
+median_parentid <- median(category_tree$parentid, na.rm = T)
+median_parentid
 
-```{r}
+# Replace missing values in parentid with the median
+category_tree <- category_tree %>% 
+  mutate(parentid = ifelse(is.na(parentid), median_parentid, parentid))
+
+# Verify changes
+sum(is.na(category_tree$parentid))
+
 # Check the data type of each variable
 str(category_tree)
-```
 
-> **Data Preprocessing for events**
 
-```{r}
+# ------------------------------------------------
+# Data Preprocessing for the event data 
+# ------------------------------------------------
+
 # Bind events to data frame
 events <- rbindlist(events)
-```
 
-```{r}
 # Check for duplicates in events
 sum(duplicated(events))
 
@@ -205,24 +119,16 @@ events <- unique(events)
 
 # Verify
 sum(duplicated(events))
-```
 
-```{r}
 # Check for NA's in events
 colSums(is.na(events) | events == "")
-```
 
-```{r}
 # Replace the NA's in the transactions for View and Add to cart since both don't involve any transactions
 events$transactionid <- replace_na(events$transactionid, 0)
-```
 
-```{r}
 # Check data type
 str(events)
-```
 
-```{r}
 # Convert to appropiate data types
 # events$visitorid <- as.character(events$visitorid)
 
@@ -230,17 +136,18 @@ str(events)
 
 # Convert 'event' to factor
 events[, event := as.factor(event)]
-```
 
-```{r}
 # Check datatype or class of the variable timestamp
 class(events$timestamp)
 
 # Convert to POSIXct# Calculate thresholds while removing NA values
 events$timestamp <- as.POSIXct(events$timestamp / 1000, origin = "1970-01-01", tz = "UTC")
-```
 
-```{r}
+
+# --------------------------------------------------
+# Exploratory Data Analysis
+# --------------------------------------------------
+
 # Data Visualisation
 options(scipen = 999)
 
@@ -259,33 +166,11 @@ events_counts %>%
     y = "Count"
   )
 
-```
 
-> [The chart above visualises the distribution of user events, addtocarts, transaction, view.]{style="text-align: justify"}
->
-> [A. View Events: The view event category has the highest count by significant margin, with a total of 2,644, 218 events. This suggests visitors are viewing items on the platform.]{style="text-align: justify"}
->
-> [B. Add to Cart Events: There are 68,966 events where visitors or users have added items to their cart. This is a positive sign as it indicates user interest in purchasing, although the number is much lower compared to the events.]{style="text-align: justify"}
->
-> [C. Transaction Events: This category has the lowest count with 22,457 events. This represents the number of completed transactions, which is a critical metric for revenue generation.]{style="text-align: justify"}
->
-> [Analysis:]{style="text-align: justify"}
->
-> [The large number of view events compared to add to carts and transaction events suggest that there might be a drop-off in the conversion funnel (A conversion funnel, also known as a sales funnel or marketing funnel, is a visual representation of the customer journey from the first point of contact with a business to the final purchase or desired action. It's a model used to understand how potential customers move through different stages towards conversion, which is typically a sale but can also be any other desired action like signing up for a newsletter, downloading a whitepaper, purchasing product, et.) Users are viewing content but not as many are proceeding to add items to cart or complete transactions.]{style="text-align: justify"}
->
-> [The ratio of view to transaction events is quite high. This could indicate that there are barriers to conversion, such as high prices, a poor user experience or lack of trust in the platform.]{style="text-align: justify"}
->
-> [The add to cart events are significantly higher than transactions, which is expected, but the gap is quite large. This could mean that users are adding items to their carts but not completing the purchase. Reasons could include abandoned carts, issues during the checkout process, or the user deciding against the purchase at the last moment.]{style="text-align: justify"}
+# --------------------------------------------------
+# Conversion Rates
+# --------------------------------------------------
 
-**Conversion Rates**
-
-Integrating conversion rates in the analysis is key, as it helps to to segment users, compare against normal behaviour or as additional features in your recommendation or anomaly detection models.
-
-Also tracking conversion rates can help you detect issues or improvements in your user funnel and overall system performance.
-
-Lastly, If there is a suspicion of some users are bots, you might compare their conversion rates with genuine users to see if there are significant differences, which further validates the bot detection.
-
-```{r}
 # Count the number of each event per visitor
 user_event_counts <- dcast(events, visitorid ~ event, fun.aggregate = length, value.var = "event", fill = 0)
 setnames(user_event_counts, old = c("view", "addtocart", "transaction"),
@@ -300,9 +185,7 @@ user_event_counts[, conversion_view_to_transaction := ifelse(num_view > 0, num_t
 
 # Inspect the calculated conversion rates
 head(user_event_counts)
-```
 
-```{r}
 # Histogram for the view-to-add conversion rate
 ggplot(user_event_counts, aes(x = conversion_view_to_add)) +
   geom_histogram(binwidth = 0.05, fill = "steelblue", color = "black", na.rm = TRUE) +
@@ -312,23 +195,12 @@ ggplot(user_event_counts, aes(x = conversion_view_to_add)) +
     y = "Number of Users"
   ) +
   theme_minimal()
-```
 
-> ### **Abnormal Bot Users Detection**
->
-> **Strategies for Bot Detection**
->
-> **Event Frequency and Volume:**
->
-> -   **High Activity:** Bots may generate a significantly higher number of events (e.g., views, add-to-carts, transactions) than typical users in a short time frame.
->
-> -   **Event Density:** Calculate the number of events per minute or per session. Extremely high densities can signal bot behaviour.
 
-```{r}
 
- # --------------------------------------
-# Anomaly Detection
-# --------------------------------------
+# --------------------------------------------------
+# Abnormalies / Bots Detection
+# --------------------------------------------------
 
 # setnames
 # setnames(events, c("timestamp", "visitorid", "event", "itemid", "transaction"))
@@ -366,37 +238,12 @@ print(paste("Number of potential bots: ", nrow(potential_bots)))
 # Show top ten bots
 top_ten_bots <- potential_bots[order(-total_events)][1:10]
 print(top_ten_bots)
-```
 
-> **Time Difference Calculation:**\
-> By computing the time difference between consecutive events, one can observe if some visitors have extremely short intervals between actions which is manchester uniteda common bot behaviours.
->
-> **\
-> Aggregation and Thresholds:**\
-> Aggregating by visitor allows the computation of overall activity metrics (e.g., total events, average time between events). Setting thresholds based on quantiles (e.g., top 5% for total events, bottom 5% for average time difference) provides a starting point for flagging anomalies
 
-```{r}
 
-# ------------------------------
-# Remove Bots
-# -------------------------------
-
-# Remove events associated with bot users from the events data
-# clean_events_df <- events[!visitorid %in% potential_bots$visitorid]
-
-# Verify how many events remain after removing bot-related events
-# cat("Number of events after removing bots:", nrow(clean_events_df), "\n")
-
-```
-
-> **Isolation Forest for Anomaly Detection**
->
-> This step adds a sophisticated, model-based layer of bot detection on top of the simple activity threshold.
-
-```{r}
-# ---------------------------------------
+# --------------------------------------------------
 # Isolation Forest for Anomaly Detection
-# ---------------------------------------
+# --------------------------------------------------
 
 # Prepare features for the Isolation Forest model.
 # Use the aggregated metrics: total_events, avg_time_diff, and median_time_diff.
@@ -425,9 +272,6 @@ visitor_stats[, anomaly_flag := ifelse(anomaly_score > anomaly_threshold, -1, 1)
 # Check the updated visitor_stats
 print(head(visitor_stats))
 
-```
-
-```{r}
 # -----------------------------
 # STEP 6: Combine Detection Criteria
 # -----------------------------
@@ -457,26 +301,10 @@ cleaned_events <- events[!visitorid %in% bot_users$visitorid]
 # Optionally, check how many unique users remain.
 print(paste("Remaining unique users after bot removal:", uniqueN(cleaned_events$visitorid)))
 
-```
 
-**Visualizing Bot Detection Results**
-
-```{r}
-# Density plot of anomaly scores
-# ggplot(visitor_stats, aes(x = anomaly_score, fill = factor(final_bot_flag))) +
-  #geom_density(alpha = 0.5) +
-  #labs(title = "Density of Anomaly Scores", x = "Anomaly Score", fill = "Bot Flag") +
-  #theme_minimal()
-```
-
-**Scatter Plot of User Activity versus Time Difference**
-
-Examine the relationship between the number of events and the average time difference per user. Bots might show distinct patterns compared to regular users.
-
-```{r}
-# ------------------------------------------------------
-#  Scatter Plot of User Activity versus Time Difference
-# ------------------------------------------------------
+# -----------------------------------------------------------
+# Scatter Plot of User Activity versus Time Difference
+# -----------------------------------------------------------
 
 # Assuming visitor_stats already contains total_events and avg_time_diff
 ggplot(visitor_stats, aes(x = total_events, y = avg_time_diff)) +
@@ -486,11 +314,8 @@ ggplot(visitor_stats, aes(x = total_events, y = avg_time_diff)) +
        x = "Total Events (log scale)", y = "Average Time Difference (seconds)") +
   theme_minimal()
 
-```
 
-**Data Visualisation after Anomaly Detection**
 
-```{r}
 # ----------------------------------------------------
 # Data Visualisation after Anomaly Detection
 # ----------------------------------------------------
@@ -511,55 +336,9 @@ events_counts %>%
     y = "Count"
   )
 
-```
 
-The charts show the distribution of user events after removing bots. The events tracked are 'view', 'addtocart' and 'transaction'.
-
-**Key Findings:**
-
--   **Views**:
-
-    -   Before bot removal: 2,664,218
-
-    -   After bot removal: 1,817,072
-
-    -   **Drop**: 847,146 (31.8% reduction)
-
-    -   **Implication**: A significant portion of views were bot-generated, indicating inflated traffic metrics.
-
--   **Addtocart**:
-
-    -   Before bot removal: 68,966
-
-    -   After bot removal: 22,947
-
-    -   **Drop**: 46,019 (66.7% reduction)
-
-    -   **Implication**: Bots contributed to addtocart actions, but less so compared to views.
-
--   **Transactions**:
-
-    -   Before bot removal: 22,457
-
-    -   After bot removal: 5,392
-
-    -   **Drop**: 17,065 (75.9% reduction)
-
-    -   **Implication**: Transactions were less affected by bots, suggesting more genuine human actions.
-
-Analysis:
-
-The large drop in views suggests that the website's traffic was significantly inflated by bots, which could affect advertising revenue and perceived popularity.
-
-The drop in addtocart events indicates that user engagement might be lower than initially thought, suggesting a need to improve the user experience or product offerings.
-
-The 75.9% reduction means that bots contributed heavily to transaction counts, but the remaining transactions after bot removal are likely more reliable as genuine human activity. This makes transactions a more trustworthy metric for evaluating real user behaviour, even though the absolute drop was large.
-
-**Data Visualisation of Top Most Viewed Products**
-
-```{r}
 # -----------------------------------------------
-# Data Visualisation of Top Most Viewed Products
+# Data Visualisation on Top Most Viewed Products
 # -----------------------------------------------
 
 # Filter the events data for view events only
@@ -585,14 +364,9 @@ ggplot(top_viewed_products, aes(x = reorder(itemid, view_count), y = view_count)
   ) +
   theme_minimal()
 
-```
-
-**Data Visualisation of Top Most Purchased Products**
-
-```{r}
 
 # --------------------------------------------------------
-# Data Visualisation of Top Most Purchased Products
+# Data Visualisation on Top Most Purchased Products
 # --------------------------------------------------------
 
 # Filter the events data for transaction events only
@@ -618,13 +392,7 @@ ggplot(top_purchased_products, aes(x = reorder(itemid, purchase_count), y = purc
   ) +
   theme_minimal()
 
-```
 
-**Conversion funnel visualisation**
-
-Show how many users progress through each stage of your funnel—from view to add-to-cart to transaction
-
-```{r}
 # ------------------------------------------
 # Conversion funnel visualisation
 # ------------------------------------------
@@ -656,18 +424,15 @@ ggplot(funnel_data, aes(x = event, y = count)) +
   geom_bar(stat = "identity", fill = "steelblue") +
   labs(title = "Conversion Funnel", x = "Event Type", y = "Count") +
   theme_minimal()
-```
 
-**Data Visualisation of Time Series of Events Over Time**
 
-```{r}
 # -----------------------------------------------------
-# Data Visualisation of Time Series of Events Over Time
+# Data Visualisation on Time Series of Events Over Time
 # ------------------------------------------------------
 
 # Aggregate events by day (or week)
 # daily_events <- cleaned_events[, .(total_events = .N), by = .(date = as.Date(timestamp))]
-  
+
 # ggplot(daily_events, aes(x = date, y = total_events)) +
 #  geom_line(color = "blue") +
 #  labs(title = "Daily Total Events", x = "Date", y = "Number of Events") +
@@ -685,23 +450,11 @@ ggplot(monthly_events, aes(x = date, y = total_events)) +
   labs(title = "Monthly Total Events", x = "Date", y = "Total Events") +
   theme_minimal()
 
-```
 
-**Data Visualisation of Distribution of Time Differences**
 
-```{r}
-
-#ggplot(cleaned_events[!is.na(time_diff)], aes(x = time_diff)) +
- # geom_histogram(binwidth = 10, fill = "coral", color = "black", alpha = 0.7) +
-  #labs(title = "Distribution of Time Differences Between Events", 
-   #    x = "Time Difference (seconds)", y = "Frequency") +
-  #theme_minimal()
-
-```
-
-Relationship Between Overall Activity and Conversion Rates
-
-```{r}
+# -----------------------------------------------------
+# Data Visualisation on Relationship Between Overall Activity and Conversion Rates
+# ------------------------------------------------------
 visitor_stats <- cleaned_events %>%
   group_by(visitorid) %>%
   summarise(
@@ -726,15 +479,11 @@ ggplot(visitor_stats, aes(x = total_events, y = conversion_view_to_add)) +
        x = "Total Events (log scale)", 
        y = "Conversion Rate (View to Add)") +
   theme_minimal()
-```
 
-**When are users most active during the day and week?** Heat-map of Event Activity by Hour and Day of Week
 
-```{r}
 # ---------------------------------------------------------
 # Heatmap of Event Activity by Hour and Day of Week
 # ----------------------------------------------------------
-
 
 # Extract hour and day of week from datetime
 cleaned_events[, hour := hour(timestamp)]
@@ -748,41 +497,36 @@ heatmap_data[, weekday := factor(weekday, levels = c("Monday", "Tuesday", "Wedne
 
 ggplot(heatmap_data, aes(x = hour, y = weekday, fill = count)) +
   geom_tile() +
- # geom_text(aes(label = count), color = "black", size = 3) +
+  # geom_text(aes(label = count), color = "black", size = 3) +
   scale_fill_gradient(low = "white", high = "red") +
   labs(title = "Heatmap of Events by Hour and Weekday", x = "Hour of Day", y = "Weekday") +
   theme_minimal()
 
 
-```
 
-**\
-Data Preprocessing for item_properties**
+# ---------------------------------------------------------
+# Data Preprocessing for item_properties
+# ----------------------------------------------------------
 
-```{r}
 # Bind item properties 1 & 2 in a data frame
 item_properties <- do.call(rbind, c(item_properties_1, item_properties_2))
-```
 
-```{r}
 # Data Cleaning for item properties
 # Check for duplicates in item_properties
 # sum(duplicated(item_properties))
-```
 
-```{r}
 # Check for NA's in item properties
 # colSums(is.na(item_properties) | item_properties == "")
-```
 
-```{r}
 # Convert to POSIXct
 item_properties$timestamp <- as.POSIXct(item_properties$timestamp / 1000, origin = "1970-01-01", tz = "UTC")
-```
 
-**Merging cleaned_events and item_properties**
 
-```{r}
+
+# ---------------------------------------------------------
+# Merging cleaned_events and item_properties
+# ----------------------------------------------------------
+
 # Merging datasets
 # Perform a left Join
 # A left join allows you to match each event with the most recent (previous) item property snapshot.
@@ -798,11 +542,12 @@ setorder(item_properties, itemid, timestamp)
 # leftjoin: for each event, get the most recent snapshot from item properties.
 # This matches on 'itemid' and finds the snapshot with a timestamp less than or equal to the event timestamp.
 events_items<- item_properties[cleaned_events, on = .(itemid, timestamp), roll = TRUE]
-```
 
-**Replace the categoryid in the property column with it corresponding value**
 
-```{r}
+# ------------------------------------------------------------------------
+# Replace the categoryid in the property column with it corresponding value
+# -------------------------------------------------------------------------
+
 # Update the 'property' column in events_items
 # events_items[property == "categoryid", property := value]
 
@@ -817,11 +562,12 @@ events_items <- events_items %>%
 # Display the first few rows to verify the changes
 # head(events_items)
 
-```
 
-**Merge events_items and categoryid**
 
-```{r}
+# ------------------------------------------------------------------------
+# Merge events_items and categoryid
+# -------------------------------------------------------------------------
+
 # Check the data types of the 'property' column in events_items and the 'categoryid' column in categorytree
 str(events_items$property)
 str(category_tree$categoryid)
@@ -829,7 +575,7 @@ str(category_tree$categoryid)
 # Convert both columns to character type to ensure they match
 events_items <- events_items %>%
   mutate(property = as.character(property))
-  
+
 category_tree <- category_tree %>%
   mutate(categoryid = as.character(categoryid))
 
@@ -841,24 +587,19 @@ merged_df <- events_items %>%
 # Display the first few rows of the merged dataset to verify the result
 # head(merged_df)
 
-```
-
-**Drop time_diff, hour, weekday from the merged_df**
-
-```{r}
 # Drop the columns "time_diff", "hour", and "weekday" from merged_df_all
 merged_df <- merged_df %>% 
   select(-time_diff, -hour, -weekday)
-```
 
-```{r}
 # Rename column 'property' to 'categoryid'
 final_df <- final_df %>% rename(categoryid = property)
-```
 
-**Filtered availability and created a new column to have only availability**
 
-```{r}
+
+# ------------------------------------------------------------------------
+# Filtered availability and created a new column to have only availability
+# -------------------------------------------------------------------------
+
 # 1. Filter for available properties
 merged_df_filtered <- merged_df %>%
   filter(property %in% c("available"))
@@ -887,143 +628,7 @@ merged_df_restructure <- merged_df_restructure %>%
 # Perform the left join safely
 merged_df <- merged_df %>%
   left_join(merged_df_restructure %>% select(itemid, available), by = "itemid")
-```
 
-Remove rows where categoryid is "available"
-
-```{r}
 # Remove rows where categoryid is "available"
 final_df <- final_df %>% 
   filter(categoryid != "available")
-```
-
-How does the availability of items impact user interactions?
-
-```{r}
-
-options(scipen = 999)
-
-# Aggregate event counts by availability status, excluding NA values
-availability_events <- final_df %>%
-  filter(!is.na(available)) %>%  # Exclude NA values
-  group_by(available, event) %>%
-  summarise(count = n(), .groups = "drop")
-
-# Plot the comparison
-ggplot(availability_events, aes(x = event, y = count, fill = as.factor(available))) +
-  geom_bar(stat = "identity", position = "dodge") +
-  scale_fill_manual(values = c("0" = "red", "1" = "green"), labels = c("Unavailable", "Available")) +
-  labs(title = "Impact of Item Availability on User Interactions",
-       x = "Event Type", 
-       y = "Number of Events", 
-       fill = "Availability") +
-  theme_minimal()
-
-```
-
-How do conversion rates vary across different times of the day?
-
-```{r}
-# Ensure timestamp is in proper datetime format
-final_df <- final_df %>%
-  mutate(hour = format(as.POSIXct(timestamp, origin = "1970-01-01", tz = "UTC"), "%H"))
-
-# Aggregate conversion rates by hour
-hourly_conversions <- final_df %>%
-  group_by(hour) %>%
-  summarise(conversion_view_to_add = sum(event == "addtocart") / sum(event == "view"),
-            conversion_add_to_purchase = sum(event == "transaction") / sum(event == "addtocart"),
-            .groups = "drop")
-
-# Reshape for plotting
-hourly_conversions_long <- pivot_longer(hourly_conversions, cols = c("conversion_view_to_add", "conversion_add_to_purchase"), names_to = "conversion_type", values_to = "rate")
-
-# Plot conversion rates over time
-ggplot(hourly_conversions_long, aes(x = as.numeric(hour), y = rate, colour = conversion_type)) +
-  geom_line(size = 1) +
-  scale_x_continuous(breaks = seq(0, 23, 1)) +
-  labs(title = "Conversion Rates by Hour of the Day",
-       x = "Hour of the Day",
-       y = "Conversion Rate",
-       colour = "Conversion Type") +
-  theme_minimal()
-
-```
-
-What Is the Relationship Between User Session Duration and Purchase Likelihood?
-
-```{r}
-# Calculate session statistics per user
-session_stats <- cleaned_events %>%
-  group_by(visitorid) %>%
-  summarise(
-    session_duration = as.numeric(difftime(max(timestamp), min(timestamp), units = "mins")),
-    total_transactions = sum(event == "transaction"),
-    total_views = sum(event == "view"),
-    conversion_rate = if_else(total_views > 0, total_transactions / total_views, NA_real_),
-    .groups = "drop"
-  ) %>%
-  filter(!is.na(conversion_rate)) %>%  # remove users with NA conversion_rate
-  filter(!is.na(session_duration))       # ensure session_duration is not NA
-
-# Bin session durations using -Inf as the lower bound
-session_stats <- session_stats %>%
-  mutate(duration_bin = cut(session_duration, 
-                            breaks = c(-Inf, 5, 10, 20, 30, Inf), 
-                            labels = c("<5", "5-10", "10-20", "20-30", "30+"),
-                            include.lowest = TRUE))
-
-# Check the binning result (no NAs should appear)
-table(session_stats$duration_bin, useNA = "ifany")
-
-# Summarise average conversion rate for each duration bin
-bin_summary <- session_stats %>%S
-  group_by(duration_bin) %>%
-  summarise(
-    avg_conversion_rate = mean(conversion_rate, na.rm = TRUE),
-    count = n(),
-    .groups = "drop"
-  )
-
-# Bar chart of average conversion rate by session duration bin
-ggplot(bin_summary, aes(x = duration_bin, y = avg_conversion_rate, fill = duration_bin)) +
-  geom_bar(stat = "identity") +
-  labs(
-    title = "Average Conversion Rate by Session Duration",
-    x = "Session Duration (minutes) Bin",
-    y = "Average Conversion Rate"
-  ) +
-  theme_minimal()
-
-
-```
-
-What is the distribution of event types across all users?
-
-```{r}
-library(dplyr)
-library(ggplot2)
-library(scales)
-
-# Aggregate total counts per event type from the final dataset
-event_distribution <- final_df %>%
-  group_by(event) %>%
-  summarise(total = n(), .groups = "drop")
-
-# Calculate overall sum of events
-overall_total <- sum(event_distribution$total)
-
-# Calculate the proportion of each event type
-event_distribution <- event_distribution %>%
-  mutate(proportion = total / overall_total)
-
-# Plot the distribution as a bar chart with percentage labels
-ggplot(event_distribution, aes(x = event, y = proportion, fill = event)) +
-  geom_bar(stat = "identity", show.legend = FALSE) +
-  scale_y_continuous(labels = percent_format(accuracy = 1)) +
-  labs(title = "Distribution of Event Types Across Users",
-       x = "Event Type",
-       y = "Proportion of Events") +
-  theme_minimal()
-
-```
