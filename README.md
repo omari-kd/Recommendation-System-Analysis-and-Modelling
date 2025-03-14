@@ -199,7 +199,7 @@ d. Retaining Only the Latest Available Status:
 To avoid multiple records per item, the dataset was grouped by itemid, sorted in descending order by timestamp, and only the most recent available status was retained.
 
 e. Final Merge:
-The processed availability data was then merged back into the merged_df to form a final_df via a left join on itemid so that all records from the main dataset were retained and enriched with the latest availability information.
+The processed availability data was then merged back into the merged_df to form a final_df via a left join on itemid so that all records from the main dataset were retained and enriched with the latest availability information. The property column was renamed to categoryid and rows containing "available" were removed since the available column had already been created.
 
 ### 4. Exploratory Data Analysis:
 ##### Visualising the Distribution of User Events
