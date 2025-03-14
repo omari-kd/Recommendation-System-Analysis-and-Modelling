@@ -303,7 +303,7 @@ Product 187946 may need optimization (pricing, descriptions or checkout flow) to
 #### Visualisation of Bot Detection 
 ![image](https://github.com/user-attachments/assets/11d5395e-bbb4-4afc-b2d5-54fea58e816e)
 
-This density plot visualizes the distribution of anomaly scores for users, with a focus on those flagged as bots. 
+This density plot visualises the distribution of anomaly scores for users, with a focus on those flagged as bots. 
 Key Observations: 
 Anomaly Score Distribution: 
 - Most users have relatively low anomaly scores, concentrated between 0.3 and 0.4.
