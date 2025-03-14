@@ -89,7 +89,7 @@ d. How does the availability of items impact user interactions?
 
 e. How do conversion rates vary across different times of the day?
 
-f. What Is the Relationship Between User Session Duration and Purchase Likelihood?
+f. What is the relationship between user session duration and purchase likelihood?
 
 g.
 
@@ -468,7 +468,7 @@ Implications:
 - There may be opportunities to optimize marketing efforts during these high-conversion periods.
 
 
-### What Is the Relationship Between User Session Duration and Purchase Likelihood?
+### What is the relationship between user session duration and purchase likelihood?
 ![Image](https://github.com/user-attachments/assets/03f62622-c2e2-4a4c-bf00-dcb2fdb1513c)
 
 This bar chart examines whether longer session durations correlate with higher conversion rates. 
