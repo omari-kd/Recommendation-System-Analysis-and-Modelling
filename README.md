@@ -435,7 +435,45 @@ User Experience:
 - Displaying unavailable items may frustrate users who attempt to purchase them.
 - The presence of unavailable items in search results or recommendations might negatively impact the overall experience.
 
+
+### How do conversion rates vary across different times of the day?
+![Image](https://github.com/user-attachments/assets/88360be9-14d7-4158-ab51-b4ce67c59187)
+
+This line chart illustrates how conversion rates for two key metrics view-to-add and add-to-purchase fluctuate throughout the day.
+
+#### Key Observations:
+
+View-to-Add Conversion Rate:
+
+- Remains relatively stable throughout the day, maintaining a consistent rate just below 0.1 (10%).
+- Shows minimal fluctuation, suggesting consistent effectiveness in converting views to add-to-cart actions regardless of time.
+
+Add-to-Purchase Conversion Rate:
+- Exhibits significant variability throughout the day.
+- Peaks occur more prominently in the late afternoon to evening (4-8 PM).
+- The highest conversion rate reaches above 0.25 (25%) around 5 PM.
+- Conversion rates dip to their lowest points during midday.
+
+Comparison Between Conversion Types:
+
+- Add-to-purchase conversions show much greater temporal variation compared to view-to-add conversions.
+- The peak add-to-purchase conversion rate is more than double the relatively stable view-to-add rate.
+
+Implications: 
+- Users are more likely to complete purchases during specific periods, particularly in the late afternoon and evening.
+- This may reflect patterns in when users have time to complete purchases, such as after work or during evening leisure time.
+- The consistent view-to-add conversion rate suggests that users are equally likely to add items to their cart regardless of time of day.
+- This indicates that the decision to add an item to a cart is less time-sensitive than the decision to complete a purchase.
+- The afternoon/evening peak could correspond with times when users have access to multiple devices (work and personal).
+- There may be opportunities to optimize marketing efforts during these high-conversion periods.
+
+
+
+
+
+
 ## Modelling
+
 
 
 ## Evaluation
@@ -511,3 +549,11 @@ Analyse Event Types: Identify if certain activities peak at different times than
 - Consider removing or deprioritising unavailable items from user-facing interfaces.
 - For unavailable items, provide clear messaging about restock dates or alternatives for user communication.
 - Implement notification systems for when unavailable items become available again.
+
+### Conversion Rates by Hour of the Day Analysis:
+- Schedule promotional emails or notifications during peak conversion hours (4-8 PM) when users are most likely to complete purchases.
+- Consider offering time-limited discounts during these periods to further incentivize purchases.
+- Ensure customer service and support teams are adequately staffed during peak conversion hours to handle potential inquiries.
+- Optimize website performance during these critical periods to prevent technical issues that could hinder conversions.
+- Correlate these conversion patterns with traffic sources to determine if certain channels drive more conversions during specific times.
+- 
