@@ -140,8 +140,6 @@ The category_tree.csv file outlines the hierarchical structure of item categorie
 
 • After ensuring that the dataset was free of duplicates, missing values and bot-generated noise, the cleaned data was exported as a new CSV file, serving as a reliable foundation for further analysis.
 
-• Once cleaned and standardised, the dataset was exported as a new CSV file.
-
 #### c. Data Processing of Timestamp and Merging Item Properties
 
 • Binding Item Properties Files:
@@ -585,17 +583,17 @@ A random forest classifier is used as a baseline model. This simple supervised c
 ## Recommendations 
 ### The top purchased products and viewed products recommendation
 
-#### 1. Optimize High-View Products: 
+##### 1. Optimize High-View Products: 
 
 Improve descriptions, images or pricing for product 187946 to boost conversions.
 
-#### 2. Engage Infrequent Users: 
+##### 2. Engage Infrequent Users: 
 
 Use targeted campaigns (discounts, personalized recommendations) to re-activate users with low engagement.
 
 
 ### User funnel recommendation
-#### 1. Optimize Conversion Pathways: 
+##### 1. Optimize Conversion Pathways: 
 a. Simplify the process from viewing to adding to cart
 
 b. Implement clear, prominent calls-to-action
@@ -604,7 +602,7 @@ c. Ensure mobile-friendly design
 
 d. Focus on the add-to-cart stage as a critical leverage point for increasing transactions
 
-#### 2. Address Cart Abandonment:
+##### 2. Address Cart Abandonment:
 a. Implement cart abandonment email campaigns
 
 b. Offer incentives for completing purchases
@@ -613,17 +611,17 @@ c. Provide multiple payment options
 
 d. Display trust signals during checkout
 
-#### 3. Personalization:
+##### 3. Personalization:
 a. Use data to personalize recommendations
 
 b. Show relevant products based on user behavior
 
 c. Implement dynamic pricing or special offers.
 
-#### Strategic Considerations
+##### Strategic Considerations
 The current funnel suggests opportunities for significant improvement in conversion rates. Even small percentage improvements could yield substantial results given the high volume of views. Focus on the add-to-cart stage as a critical leverage point for increasing transactions. 
 
-#### 4. Analytics and Testing:
+##### 4. Analytics and Testing:
 a. Gather user feedback to identify specific pain points
 
 ### Monthly total events recommendation
