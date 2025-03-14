@@ -203,7 +203,8 @@ The processed availability data was then merged back into the merged_df to form 
 
 ### 4. Exploratory Data Analysis:
 ##### Visualising the Distribution of User Events
-![Image](https://github.com/user-attachments/assets/48c3f9c8-694e-4625-a470-55409074bf3d)
+![image](https://github.com/user-attachments/assets/e8d3afd3-bf28-4e6b-bccf-5fa67c5bb06e)
+
 
 The chart above visualises the distribution of user events, addtocarts, transaction, view.
 
@@ -223,7 +224,8 @@ The ratio of view to transaction events is quite high. This could indicate that 
 The add to cart events are significantly higher than transactions, which is expected, but the gap is quite large. This could mean that users are adding items to their carts but not completing the purchase. Reasons could include abandoned carts, issues during the checkout process, or the user deciding against the purchase at the last moment.
 
 ##### User Event Distribution Visualisation After Anomaly Removal
-![Image](https://github.com/user-attachments/assets/df651954-e8de-4038-92f9-fea191527f50)
+![image](https://github.com/user-attachments/assets/34fac08a-6bdf-4511-8f39-8c736bc6ccf2)
+
 
 The charts show the distribution of user events after removing bots. The events tracked are 'view', 'addtocart' and 'transaction'.
 
@@ -271,14 +273,16 @@ The 75.9% reduction means that bots contributed heavily to transaction counts, b
 
 
 ##### Visualising the Top 10 Most Viewed Products and Top 10 Most Purchased Products
-![Image](https://github.com/user-attachments/assets/0fd3bc57-c985-4e7f-83f8-f54df70141cb)
+![image](https://github.com/user-attachments/assets/b7744085-3a4a-40cf-a98f-a31d9d6ba231)
+
 
 The bar chart titled "Top 10 Most Viewed Products" provides insights into product popularity based on view counts. 
 
 Product 187946 dominates with over 3,000 views, far exceeding all other products.
 The remaining products have significantly fewer views, ranging from 1,000 to 2,000 views.
 
-![Image](https://github.com/user-attachments/assets/00b7e2d3-b2a4-4ac8-869b-8ed785a487a2)
+![image](https://github.com/user-attachments/assets/5587589e-05f6-431d-b22c-cbcab888e659)
+
 
 The bar chart titled "Top 10 Most Purchased Products" reveals key insights into product sales performance.
 
@@ -302,7 +306,8 @@ Product 187946 may need optimization (pricing, descriptions or checkout flow) to
 ### Answers to key analytic questions:
 
 ### How effective is the user funnel?
-![Image](https://github.com/user-attachments/assets/fbe4d5c5-8dee-4b06-9bb4-a8add94965af)
+![image](https://github.com/user-attachments/assets/1ebd6369-f20d-4432-bce4-9e09180f6c87)
+
 
 The bar chart illustrates the user journey from viewing content to completing a transaction, revealing critical insights about user engagement and conversion rates. The x-axis represents the event types: view, addtocart and transaction. The y-axis represents the count of each event type. The bars are plotted in a way that shows a significant drop-off from views to addtocart, and then again from addtocart to transaction.
 
@@ -330,7 +335,7 @@ The current funnel suggests opportunities for significant improvement in convers
 Post-bot removal, the data provides a clearer picture of real user behavior. While views remain high, the conversion funnel highlights opportunities to improve engagement and revenue by focusing on genuine user interactions
 
 ### What are the trends in user activity over time?
-![Image](https://github.com/user-attachments/assets/b29b8f56-2d67-4eaa-a26a-cd579ac9671e)
+![Image](https://github.com/user-attachments/assets/023f80ab-f1c0-46cc-85e2-e6ebb629721f)
 
 The chart shows monthly total events from May through September, with the y-axis representing total events (up to 22,208) and the x-axis showing dates.
 
@@ -370,7 +375,7 @@ c. Product updates
 d. External news or trends
 
 ### When are users most active?
-![Image](https://github.com/user-attachments/assets/66d962a4-cfc1-4b83-ab65-938c8afd6d99)
+![Image](https://github.com/user-attachments/assets/fd47ae65-bf4f-4be0-baf5-783ba00fff08)
 
 The heatmap shows event counts across different hours of the day and weekdays. 
 
@@ -403,7 +408,7 @@ User Experience:
 
 
 ### How does the availability of items impact user interactions?
-![Image](https://github.com/user-attachments/assets/bdd9b61e-6f4f-4fc6-9388-a2b457e29ba3)
+![Image](https://github.com/user-attachments/assets/880c7105-555f-41c2-81be-6b001490168c) 
 
 This bar chart compares user interactions with available versus unavailable items across three key event types: views, add-to-carts and transactions.
 
@@ -437,7 +442,7 @@ User Experience:
 
 
 ### How do conversion rates vary across different times of the day?
-![Image](https://github.com/user-attachments/assets/88360be9-14d7-4158-ab51-b4ce67c59187)
+![image](https://github.com/user-attachments/assets/78e5e31b-6651-460f-ac74-fb178345e17d)
 
 This line chart illustrates how conversion rates for two key metrics view-to-add and add-to-purchase fluctuate throughout the day.
 
