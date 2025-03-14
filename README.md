@@ -91,7 +91,7 @@ e. How do conversion rates vary across different times of the day?
 
 f. What is the relationship between user session duration and purchase likelihood?
 
-g.
+g. What is the distribution of event types across all users?
 
 ### 2. Data Understanding:
 
@@ -469,7 +469,7 @@ Implications:
 
 
 ### What is the relationship between user session duration and purchase likelihood?
-![Image](https://github.com/user-attachments/assets/03f62622-c2e2-4a4c-bf00-dcb2fdb1513c)
+![Image](https://github.com/user-attachments/assets/e85fa54f-c5f0-4347-82df-e2b8e6750048)
 
 This bar chart examines whether longer session durations correlate with higher conversion rates. 
 #### Key Observations:
@@ -498,6 +498,27 @@ Experience Optimization:
 - The platform should be optimized to help users find what they need efficiently, preventing both overly short and excessively long sessions.
 - Streamlining the user journey could help convert short-session users who might be leaving due to frustration or lack of engagement.
 
+### What is the distribution of event types across all users? 
+![Image](https://github.com/user-attachments/assets/4d2d0145-52f0-4f7d-ab7b-4715d344e8a1)
+
+This bar chart illustrates the proportion of different event types across users, revealing critical insights about user engagement patterns.  
+#### Key Observations: 
+Dominance of Views:
+- Views constitute the overwhelming majority of events, representing approximately 95-99% of all user interactions.
+- This indicates that most users engage with content but do not proceed to take further action.
+
+Minimal Add-to-Cart Activity: 
+- Add-to-cart events are extremely rare, accounting for only 1-2% of total events.
+- This suggests that while users view content, they rarely add items to their cart.
+
+Negligible Transactions: 
+- Transaction events are the least common, representing less than 1% of all events.
+- This highlights a significant challenge in converting user interest into actual purchases.
+
+#### Implications: 
+- The data reveals a typical conversion funnel where most users drop off at each stage.
+- The platform faces challenges in converting viewers into purchasers.
+- While marketing efforts successfully drive views, they may not be effectively encouraging users to take further action.
 
 
 ## Modelling
@@ -508,7 +529,7 @@ Experience Optimization:
 
 
 ## Recommendations 
-### The Top Purchased Products and Viewed Products
+### The top purchased products and viewed products recommendation
 
 #### 1. Optimize High-View Products: 
 
@@ -519,7 +540,7 @@ Improve descriptions, images or pricing for product 187946 to boost conversions.
 Use targeted campaigns (discounts, personalized recommendations) to re-activate users with low engagement.
 
 
-### The User Funnel Analysis
+### User funnel recommendation
 #### 1. Optimize Conversion Pathways: 
 a. Simplify the process from viewing to adding to cart
 
@@ -545,13 +566,13 @@ b. Show relevant products based on user behavior
 
 c. Implement dynamic pricing or special offers.
 
-### Strategic Considerations
+#### Strategic Considerations
 The current funnel suggests opportunities for significant improvement in conversion rates. Even small percentage improvements could yield substantial results given the high volume of views. Focus on the add-to-cart stage as a critical leverage point for increasing transactions. 
 
 #### 4. Analytics and Testing:
 a. Gather user feedback to identify specific pain points
 
-### Monthly Total Events Analysis:
+### Monthly total events recommendation
 a. Investigate Recent Decline:
 - Determine the cause of the recent drop in events
 - Check for technical issues in event tracking
@@ -565,22 +586,34 @@ b. Correlate with External Factors:
 c. Implement Real-Time Monitoring:
 - Create dashboards to monitor key metrics in real-time
 
-### User Activity Analysis: 
+### User activity recommendation
 Implement Time-Based Strategies:
 - Create targeted marketing campaigns that align with peak activity windows.
 - Develop special weekend promotions to leverage Saturday and Sunday engagement patterns.
 
 Analyse Event Types: Identify if certain activities peak at different times than others.
 
-### User Interactions on Items Availability Analysis:
+### User interactions on items availability recommendation
 - Prioritise displaying available items in search results and recommendations.
 - Consider removing or deprioritising unavailable items from user-facing interfaces.
 - For unavailable items, provide clear messaging about restock dates or alternatives for user communication.
 - Implement notification systems for when unavailable items become available again.
 
-### Conversion Rates by Hour of the Day Analysis:
+### Conversion rates by hour of the day recommendation
 - Schedule promotional emails or notifications during peak conversion hours (4-8 PM) when users are most likely to complete purchases.
 - Consider offering time-limited discounts during these periods to further incentivize purchases.
 - Ensure customer service and support teams are adequately staffed during peak conversion hours to handle potential inquiries.
 - Optimize website performance during these critical periods to prevent technical issues that could hinder conversions.
 - Correlate these conversion patterns with traffic sources to determine if certain channels drive more conversions during specific times.
+
+### Relationship between user session duration and purchase likelihood recommendation 
+- Consider implementing guided tours or help features.
+- Track why the 5-10 minute session duration is optimal and maintain these positive factors.
+- Implement personalized recommendations.
+
+### Distribution of event types across all users recommendation 
+- Use data to personalize recommendations
+- Show relevant products based on user behavior
+- Create segmented marketing messages based on user behavior
+- Conduct surveys or user testing to identify pain points
+- Test different user interface designs
