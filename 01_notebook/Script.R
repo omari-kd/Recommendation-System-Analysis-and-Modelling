@@ -632,3 +632,130 @@ merged_df <- merged_df %>%
 # Remove rows where categoryid is "available"
 final_df <- final_df %>% 
   filter(categoryid != "available")
+
+
+
+# ------------------------------------------------------------------------
+# How does the availability of items impact user interactions?
+# -------------------------------------------------------------------------
+options(scipen = 999)
+
+# Aggregate event counts by availability status, excluding NA values
+availability_events <- final_df %>%
+  filter(!is.na(available)) %>%  # Exclude NA values
+  group_by(available, event) %>%
+  summarise(count = n(), .groups = "drop")
+
+# Plot the comparison
+ggplot(availability_events, aes(x = event, y = count, fill = as.factor(available))) +
+  geom_bar(stat = "identity", position = "dodge") +
+  scale_fill_manual(values = c("0" = "red", "1" = "green"), labels = c("Unavailable", "Available")) +
+  labs(title = "Impact of Item Availability on User Interactions",
+       x = "Event Type", 
+       y = "Number of Events", 
+       fill = "Availability") +
+  theme_minimal()
+
+
+
+# ------------------------------------------------------------------------
+# How do conversion rates vary across different times of the day?
+# -------------------------------------------------------------------------
+# Ensure timestamp is in proper datetime format
+final_df <- final_df %>%
+  mutate(hour = format(as.POSIXct(timestamp, origin = "1970-01-01", tz = "UTC"), "%H"))
+
+# Aggregate conversion rates by hour
+hourly_conversions <- final_df %>%
+  group_by(hour) %>%
+  summarise(conversion_view_to_add = sum(event == "addtocart") / sum(event == "view"),
+            conversion_add_to_purchase = sum(event == "transaction") / sum(event == "addtocart"),
+            .groups = "drop")
+
+# Reshape for plotting
+hourly_conversions_long <- pivot_longer(hourly_conversions, cols = c("conversion_view_to_add", "conversion_add_to_purchase"), names_to = "conversion_type", values_to = "rate")
+
+# Plot conversion rates over time
+ggplot(hourly_conversions_long, aes(x = as.numeric(hour), y = rate, colour = conversion_type)) +
+  geom_line(size = 1) +
+  scale_x_continuous(breaks = seq(0, 23, 1)) +
+  labs(title = "Conversion Rates by Hour of the Day",
+       x = "Hour of the Day",
+       y = "Conversion Rate",
+       colour = "Conversion Type") +
+  theme_minimal()
+
+
+
+
+# ------------------------------------------------------------------------
+# What Is the Relationship Between User Session Duration and Purchase Likelihood?
+# -------------------------------------------------------------------------
+# Calculate session statistics per user
+session_stats <- cleaned_events %>%
+  group_by(visitorid) %>%
+  summarise(
+    session_duration = as.numeric(difftime(max(timestamp), min(timestamp), units = "mins")),
+    total_transactions = sum(event == "transaction"),
+    total_views = sum(event == "view"),
+    conversion_rate = if_else(total_views > 0, total_transactions / total_views, NA_real_),
+    .groups = "drop"
+  ) %>%
+  filter(!is.na(conversion_rate)) %>%  # remove users with NA conversion_rate
+  filter(!is.na(session_duration))       # ensure session_duration is not NA
+
+# Bin session durations using -Inf as the lower bound
+session_stats <- session_stats %>%
+  mutate(duration_bin = cut(session_duration, 
+                            breaks = c(-Inf, 5, 10, 20, 30, Inf), 
+                            labels = c("<5", "5-10", "10-20", "20-30", "30+"),
+                            include.lowest = TRUE))
+
+# Check the binning result (no NAs should appear)
+table(session_stats$duration_bin, useNA = "ifany")
+
+# Summarise average conversion rate for each duration bin
+bin_summary <- session_stats %>%S
+group_by(duration_bin) %>%
+  summarise(
+    avg_conversion_rate = mean(conversion_rate, na.rm = TRUE),
+    count = n(),
+    .groups = "drop"
+  )
+
+# Bar chart of average conversion rate by session duration bin
+ggplot(bin_summary, aes(x = duration_bin, y = avg_conversion_rate, fill = duration_bin)) +
+  geom_bar(stat = "identity") +
+  labs(
+    title = "Average Conversion Rate by Session Duration",
+    x = "Session Duration (minutes) Bin",
+    y = "Average Conversion Rate"
+  ) +
+  theme_minimal()
+
+
+
+
+# ------------------------------------------------------------------------
+# What is the distribution of event types across all users?
+# -------------------------------------------------------------------------
+# Aggregate total counts per event type from the final dataset
+event_distribution <- final_df %>%
+  group_by(event) %>%
+  summarise(total = n(), .groups = "drop")
+
+# Calculate overall sum of events
+overall_total <- sum(event_distribution$total)
+
+# Calculate the proportion of each event type
+event_distribution <- event_distribution %>%
+  mutate(proportion = total / overall_total)
+
+# Plot the distribution as a bar chart with percentage labels
+ggplot(event_distribution, aes(x = event, y = proportion, fill = event)) +
+  geom_bar(stat = "identity", show.legend = FALSE) +
+  scale_y_continuous(labels = percent_format(accuracy = 1)) +
+  labs(title = "Distribution of Event Types Across Users",
+       x = "Event Type",
+       y = "Proportion of Events") +
+  theme_minimal()

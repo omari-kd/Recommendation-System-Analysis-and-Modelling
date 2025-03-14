@@ -889,7 +889,7 @@ merged_df <- merged_df %>%
   left_join(merged_df_restructure %>% select(itemid, available), by = "itemid")
 ```
 
-Remove rows where categoryid is "available"
+**Remove rows where categoryid is "available"**
 
 ```{r}
 # Remove rows where categoryid is "available"
@@ -897,7 +897,7 @@ final_df <- final_df %>%
   filter(categoryid != "available")
 ```
 
-How does the availability of items impact user interactions?
+**How does the availability of items impact user interactions?**
 
 ```{r}
 
@@ -921,7 +921,7 @@ ggplot(availability_events, aes(x = event, y = count, fill = as.factor(available
 
 ```
 
-How do conversion rates vary across different times of the day?
+**How do conversion rates vary across different times of the day?**
 
 ```{r}
 # Ensure timestamp is in proper datetime format
@@ -950,7 +950,7 @@ ggplot(hourly_conversions_long, aes(x = as.numeric(hour), y = rate, colour = con
 
 ```
 
-What Is the Relationship Between User Session Duration and Purchase Likelihood?
+**What Is the Relationship Between User Session Duration and Purchase Likelihood?**
 
 ```{r}
 # Calculate session statistics per user
@@ -998,12 +998,9 @@ ggplot(bin_summary, aes(x = duration_bin, y = avg_conversion_rate, fill = durati
 
 ```
 
-What is the distribution of event types across all users?
+**What is the distribution of event types across all users?**
 
 ```{r}
-library(dplyr)
-library(ggplot2)
-library(scales)
 
 # Aggregate total counts per event type from the final dataset
 event_distribution <- final_df %>%
