@@ -302,6 +302,18 @@ Top Purchased Products (461686, 7943): 24–23 purchases each, suggesting these 
 
 Product 187946 may need optimization (pricing, descriptions or checkout flow) to convert viewers into buyers. Top purchased products could be leveraged for cross-selling or inventory prioritization.
 
+#### Visualisation of Bot Detection 
+![image](https://github.com/user-attachments/assets/11d5395e-bbb4-4afc-b2d5-54fea58e816e)
+
+This density plot visualizes the distribution of anomaly scores for users, with a focus on those flagged as bots. 
+Key Observations: 
+Anomaly Score Distribution: 
+- Most users have relatively low anomaly scores, concentrated between 0.3 and 0.4.
+- The distribution shows a long tail, with fewer users having higher anomaly scores extending up to 0.9.
+
+Bot Flagged Users: 
+- Users flagged as bots (pink shaded area) are primarily concentrated in the lower anomaly score range (0.3-0.4).
+- There's a secondary concentration of bot-flagged users around the 0.6 anomaly score.
 
 ### Answers to key analytic questions:
 
