@@ -158,7 +158,7 @@ item_properties_2 <- read_in_chunks("./00_raw_data/item_properties_part2.csv")
 # item_properites <- c(item_properties_1, item_properties_2)
 ```
 
-> **Data Preprocessing for category_tree**
+**Data Preprocessing for category_tree**
 
 ```{r}
 # Check for duplicates and clean column names
@@ -189,7 +189,7 @@ sum(is.na(category_tree$parentid))
 str(category_tree)
 ```
 
-> **Data Preprocessing for events**
+**Data Preprocessing for events**
 
 ```{r}
 # Bind events to data frame
@@ -261,21 +261,21 @@ events_counts %>%
 
 ```
 
-> [The chart above visualises the distribution of user events, addtocarts, transaction, view.]{style="text-align: justify"}
->
-> [A. View Events: The view event category has the highest count by significant margin, with a total of 2,644, 218 events. This suggests visitors are viewing items on the platform.]{style="text-align: justify"}
->
-> [B. Add to Cart Events: There are 68,966 events where visitors or users have added items to their cart. This is a positive sign as it indicates user interest in purchasing, although the number is much lower compared to the events.]{style="text-align: justify"}
->
-> [C. Transaction Events: This category has the lowest count with 22,457 events. This represents the number of completed transactions, which is a critical metric for revenue generation.]{style="text-align: justify"}
->
-> [Analysis:]{style="text-align: justify"}
->
-> [The large number of view events compared to add to carts and transaction events suggest that there might be a drop-off in the conversion funnel (A conversion funnel, also known as a sales funnel or marketing funnel, is a visual representation of the customer journey from the first point of contact with a business to the final purchase or desired action. It's a model used to understand how potential customers move through different stages towards conversion, which is typically a sale but can also be any other desired action like signing up for a newsletter, downloading a whitepaper, purchasing product, et.) Users are viewing content but not as many are proceeding to add items to cart or complete transactions.]{style="text-align: justify"}
->
-> [The ratio of view to transaction events is quite high. This could indicate that there are barriers to conversion, such as high prices, a poor user experience or lack of trust in the platform.]{style="text-align: justify"}
->
-> [The add to cart events are significantly higher than transactions, which is expected, but the gap is quite large. This could mean that users are adding items to their carts but not completing the purchase. Reasons could include abandoned carts, issues during the checkout process, or the user deciding against the purchase at the last moment.]{style="text-align: justify"}
+[The chart above visualises the distribution of user events, addtocarts, transaction, view.]{style="text-align: justify"}
+
+[A. View Events: The view event category has the highest count by significant margin, with a total of 2,644, 218 events. This suggests visitors are viewing items on the platform.]{style="text-align: justify"}
+
+[B. Add to Cart Events: There are 68,966 events where visitors or users have added items to their cart. This is a positive sign as it indicates user interest in purchasing, although the number is much lower compared to the events.]{style="text-align: justify"}
+
+[C. Transaction Events: This category has the lowest count with 22,457 events. This represents the number of completed transactions, which is a critical metric for revenue generation.]{style="text-align: justify"}
+
+[Analysis:]{style="text-align: justify"}
+
+[The large number of view events compared to add to carts and transaction events suggest that there might be a drop-off in the conversion funnel (A conversion funnel, also known as a sales funnel or marketing funnel, is a visual representation of the customer journey from the first point of contact with a business to the final purchase or desired action. It's a model used to understand how potential customers move through different stages towards conversion, which is typically a sale but can also be any other desired action like signing up for a newsletter, downloading a whitepaper, purchasing product, et.) Users are viewing content but not as many are proceeding to add items to cart or complete transactions.]{style="text-align: justify"}
+
+[The ratio of view to transaction events is quite high. This could indicate that there are barriers to conversion, such as high prices, a poor user experience or lack of trust in the platform.]{style="text-align: justify"}
+
+[The add to cart events are significantly higher than transactions, which is expected, but the gap is quite large. This could mean that users are adding items to their carts but not completing the purchase. Reasons could include abandoned carts, issues during the checkout process, or the user deciding against the purchase at the last moment.]{style="text-align: justify"}
 
 **Conversion Rates**
 
@@ -314,15 +314,15 @@ ggplot(user_event_counts, aes(x = conversion_view_to_add)) +
   theme_minimal()
 ```
 
-> ### **Abnormal Bot Users Detection**
->
-> **Strategies for Bot Detection**
->
-> **Event Frequency and Volume:**
->
-> -   **High Activity:** Bots may generate a significantly higher number of events (e.g., views, add-to-carts, transactions) than typical users in a short time frame.
->
-> -   **Event Density:** Calculate the number of events per minute or per session. Extremely high densities can signal bot behaviour.
+### **Abnormal Bot Users Detection**
+
+**Strategies for Bot Detection**
+
+**Event Frequency and Volume:**
+
+-   **High Activity:** Bots may generate a significantly higher number of events (e.g., views, add-to-carts, transactions) than typical users in a short time frame.
+
+-   **Event Density:** Calculate the number of events per minute or per session. Extremely high densities can signal bot behaviour.
 
 ```{r}
 
@@ -368,12 +368,12 @@ top_ten_bots <- potential_bots[order(-total_events)][1:10]
 print(top_ten_bots)
 ```
 
-> **Time Difference Calculation:**\
-> By computing the time difference between consecutive events, one can observe if some visitors have extremely short intervals between actions which is manchester uniteda common bot behaviours.
->
-> **\
-> Aggregation and Thresholds:**\
-> Aggregating by visitor allows the computation of overall activity metrics (e.g., total events, average time between events). Setting thresholds based on quantiles (e.g., top 5% for total events, bottom 5% for average time difference) provides a starting point for flagging anomalies
+**Time Difference Calculation:**\
+By computing the time difference between consecutive events, one can observe if some visitors have extremely short intervals between actions which is manchester uniteda common bot behaviours.
+
+**\
+Aggregation and Thresholds:**\
+Aggregating by visitor allows the computation of overall activity metrics (e.g., total events, average time between events). Setting thresholds based on quantiles (e.g., top 5% for total events, bottom 5% for average time difference) provides a starting point for flagging anomalies
 
 ```{r}
 
