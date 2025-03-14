@@ -89,7 +89,7 @@ d. How does the availability of items impact user interactions?
 
 e. How do conversion rates vary across different times of the day?
 
-f.
+f. What Is the Relationship Between User Session Duration and Purchase Likelihood?
 
 g.
 
@@ -468,7 +468,35 @@ Implications:
 - There may be opportunities to optimize marketing efforts during these high-conversion periods.
 
 
+### What Is the Relationship Between User Session Duration and Purchase Likelihood?
+![Image](https://github.com/user-attachments/assets/03f62622-c2e2-4a4c-bf00-dcb2fdb1513c)
 
+This bar chart examines whether longer session durations correlate with higher conversion rates. 
+#### Key Observations:
+Peak Conversion Rate: 
+
+- The highest conversion rate occurs in the 5-10 minute session duration bin (~0.03 or 3%).
+- This suggests users who spend 5-10 minutes on the platform are most likely to convert.
+
+Declining Conversion Rates:
+
+- Conversion rates decrease for sessions shorter than 5 minutes and longer than 10 minutes.
+- The longest sessions (30+ minutes) have the lowest conversion rate (~0.005 or 0.5%), similar to the shortest sessions.
+
+Non-Linear Relationship: 
+- The relationship between session duration and conversion rate is not linear.
+- There's an optimal session duration window (5-10 minutes) where conversion rates are maximized.
+
+Implications:
+
+User Intent:  
+- Users who spend 5-10 minutes might be more intentional about their actions, completing purchases efficiently.
+- Very short sessions may represent users who leave quickly without engaging.
+- Very long sessions might indicate browsing without purchase intent or difficulty navigating the platform.
+
+Experience Optimization: 
+- The platform should be optimized to help users find what they need efficiently, preventing both overly short and excessively long sessions.
+- Streamlining the user journey could help convert short-session users who might be leaving due to frustration or lack of engagement.
 
 
 
@@ -556,4 +584,3 @@ Analyse Event Types: Identify if certain activities peak at different times than
 - Ensure customer service and support teams are adequately staffed during peak conversion hours to handle potential inquiries.
 - Optimize website performance during these critical periods to prevent technical issues that could hinder conversions.
 - Correlate these conversion patterns with traffic sources to determine if certain channels drive more conversions during specific times.
-- 
