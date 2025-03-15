@@ -541,6 +541,8 @@ Negligible Transactions:
 Task 1: Predicting Item Properties for "Add-to-Cart" Events Using "View" Events 
 
 Step-by-Step Process 
+For memory optimisation the raw dataset (final_df) was converted into a data.table (final_dt). During this conversion missing values in the parentid column were replaced with -1 and those in the available column were replaced with 0 in final_df. In the final_dt these missing values were dropped. The resulting final_dt was then used for all subsequent machine learning tasks ensuring a cleaner and more memory-efficient dataset.
+
 ### Extract View and Add-to-Cart Events 
 The dataset is separated into two subsets:
 - views_df is created by filtering for "view" events to build user profiles.
