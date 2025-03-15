@@ -591,9 +591,6 @@ merged_df <- events_items %>%
 merged_df <- merged_df %>% 
   select(-time_diff, -hour, -weekday)
 
-# Rename column 'property' to 'categoryid'
-final_df <- final_df %>% rename(categoryid = property)
-
 
 
 # ------------------------------------------------------------------------
@@ -629,9 +626,38 @@ merged_df_restructure <- merged_df_restructure %>%
 merged_df <- merged_df %>%
   left_join(merged_df_restructure %>% select(itemid, available), by = "itemid")
 
+
+# -------------------------------------
+# Renamed Columns
+# -------------------------------------
+
+
+# Rename column 'property' to 'categoryid'
+final_df <- final_df %>% rename(categoryid = property)
+
 # Remove rows where categoryid is "available"
 final_df <- final_df %>% 
   filter(categoryid != "available")
+
+
+
+
+# ----------------------------------------------------------
+# Handling Missing Values
+# ----------------------------------------------------------
+
+
+# Convert final_df to a data.table
+final_dt <- as.data.table(final_df)
+
+# Replace missing values in 'available' with 0
+final_dt[, available := ifelse(is.na(available), 0, available)]
+
+# Replace missing values in 'parentid' with -1
+final_dt[, parentid := ifelse(is.na(parentid), -1, parentid)]
+
+# Verify that the replacements worked by printing the count of NA's in each column
+print(colSums(is.na(final_dt)))
 
 
 
@@ -655,6 +681,7 @@ ggplot(availability_events, aes(x = event, y = count, fill = as.factor(available
        y = "Number of Events", 
        fill = "Availability") +
   theme_minimal()
+
 
 
 
@@ -759,3 +786,104 @@ ggplot(event_distribution, aes(x = event, y = proportion, fill = event)) +
        x = "Event Type",
        y = "Proportion of Events") +
   theme_minimal()
+
+
+
+
+
+# ------------------------------------------------------------------------
+# MODELLING
+# -------------------------------------------------------------------------
+
+
+# ------------------------------------------------------------------------
+# Remove Na's in the final_df for memory optimisation
+# -------------------------------------------------------------------------
+# Check NA's in columns
+colSums(is.na(final_df))
+
+# Remove NA's in parentid and available
+final_df_clean <- final_df[!is.na(final_df$parentid)]
+
+final_df_clean <- final_df[!is.na(final_df$available)]
+
+# Verify changes
+colSums(is.na(final_df_clean))
+
+# ------------------------------------------------------------------------
+# Task 1
+# When a customer comes to an e-commerce site, he looks for a product with particular 
+# properties: price range, vendor, product type and etc. These properties are implicit, 
+# so it's hard to determine them through clicks log. Try to create an algorithm which 
+# predicts properties of items in "addtocart" event by using data from "view" events 
+# for any visitor in the published log.
+# -------------------------------------------------------------------------
+
+library(randomForest)
+library(dplyr)
+library(tidyr)
+
+# 1. Extract view events and add-to-cart events
+views_df <- final_df_clean %>% filter(event == "view")
+atc_df   <- final_df_clean %>% filter(event == "addtocart")
+
+# 2. Aggregate view events per visitor and category (without converting categoryid)
+view_features <- views_df %>%
+  group_by(visitorid, categoryid) %>%
+  summarise(views_count = n(), .groups = "drop") %>%
+  pivot_wider(names_from = categoryid, 
+              values_from = views_count, 
+              values_fill = list(views_count = 0))
+
+# Convert column names to syntactically valid names
+colnames(view_features) <- make.names(colnames(view_features))
+
+# 3. Merge the aggregated view features with add-to-cart events
+training_data <- atc_df %>% left_join(view_features, by = "visitorid")
+
+# 4. Prepare the training dataset:
+#    Set the target variable as the categoryid of the add-to-cart event and convert it to a factor.
+training_data <- training_data %>%
+  mutate(target = as.factor(as.character(categoryid)))
+
+# Select only the features from the aggregated view data and the target variable.
+feature_data <- training_data %>%
+  select(-timestamp, -itemid, -event, -transactionid, -parentid, -available, -categoryid)
+
+# Check frequency of each target level in feature_data
+target_counts <- table(feature_data$target)
+print(target_counts)
+
+# Define a threshold (e.g., only keep levels with more than 10 observations)
+levels_to_keep <- names(target_counts)[target_counts > 10]
+
+# Filter feature_data to keep only rows with target levels in levels_to_keep
+feature_data <- feature_data[feature_data$target %in% levels_to_keep, ]
+
+# Drop unused levels
+feature_data$target <- droplevels(feature_data$target)
+
+
+# Verify that there are no empty levels
+print(table(feature_data$target))
+
+# 5. Train a Random Forest classifier
+set.seed(42)
+rf_model <- randomForest(target ~ ., data = feature_data, na.action = na.omit)
+print(rf_model)
+
+
+
+
+# -----------------------------------------
+# Confusion Matrix
+# -----------------------------------------
+
+library(caret)
+
+# Predict on the training set 
+predictions <- predict(rf_model, newdata = feature_data, na.action = na.omit)
+
+# Create a confusion matrix comparing predictions and true target values
+cm <- confusionMatrix(predictions, feature_data$target)
+print(cm)

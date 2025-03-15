@@ -80,16 +80,42 @@ output: html_notebook
 # ----------------------------
 # Load libraries
 # ----------------------------
+# data.table: for fast and memory-efficient data manipulation on large datasets
 library(data.table)
+
+# dplyr: for data manipulation using a grammar of data manipulation (e.g. filtering, mutating, summarising)
 library(dplyr)
+
+# tidyr: for tidying and reshaping data (e.g. pivoting data from long to wide format)
 library(tidyr)
+
+# ggplot2: for creating elegant and complex data visualisations
 library(ggplot2)
+
+# caret: for predictive modelling and machine learning workflows, including pre-processing and dummy variable creation
 library(caret)
+
+# janitor: for cleaning data and column names to ensure consistent and tidy data frames
 library(janitor)
+
+# reshape2: for data reshaping operations (e.g. melt and cast), useful if tidyr functions are insufficient
 library(reshape2)
+
+# scales: for scaling and formatting axes in ggplot2 visualisations (e.g. percentage labels)
 library(scales)
+
+# lubridate: for easy manipulation of dates and times
 library(lubridate)
-library(isotree)  
+
+# isotree: for implementing Isolation Forests, an anomaly detection algorithm
+library(isotree)
+
+# Matrix: for working with sparse matrices efficiently, useful in high-dimensional data scenarios
+library(Matrix)
+
+# randomForest: for building Random Forest models for classification or regression tasks
+library(randomForest)
+
 ```
 
 ```{r}
@@ -389,9 +415,9 @@ Aggregating by visitor allows the computation of overall activity metrics (e.g.,
 
 ```
 
-> **Isolation Forest for Anomaly Detection**
->
-> This step adds a sophisticated, model-based layer of bot detection on top of the simple activity threshold.
+**Isolation Forest for Anomaly Detection**
+
+This step adds a sophisticated, model-based layer of bot detection on top of the simple activity threshold.
 
 ```{r}
 # ---------------------------------------
@@ -463,10 +489,10 @@ print(paste("Remaining unique users after bot removal:", uniqueN(cleaned_events$
 
 ```{r}
 # Density plot of anomaly scores
-# ggplot(visitor_stats, aes(x = anomaly_score, fill = factor(final_bot_flag))) +
-  #geom_density(alpha = 0.5) +
-  #labs(title = "Density of Anomaly Scores", x = "Anomaly Score", fill = "Bot Flag") +
-  #theme_minimal()
+ggplot(bot_users, aes(x = anomaly_score, fill = factor(final_bot_flag))) +
+  geom_density(alpha = 0.5) +
+  labs(title = "Density of Anomaly Scores", x = "Anomaly Score", fill = "Bot Flag") +
+  theme_minimal()
 ```
 
 **Scatter Plot of User Activity versus Time Difference**
@@ -699,7 +725,7 @@ ggplot(monthly_events, aes(x = date, y = total_events)) +
 
 ```
 
-Relationship Between Overall Activity and Conversion Rates
+**Relationship Between Overall Activity and Conversion Rates**
 
 ```{r}
 visitor_stats <- cleaned_events %>%
@@ -851,11 +877,6 @@ merged_df <- merged_df %>%
   select(-time_diff, -hour, -weekday)
 ```
 
-```{r}
-# Rename column 'property' to 'categoryid'
-final_df <- final_df %>% rename(categoryid = property)
-```
-
 **Filtered availability and created a new column to have only availability**
 
 ```{r}
@@ -889,12 +910,39 @@ merged_df <- merged_df %>%
   left_join(merged_df_restructure %>% select(itemid, available), by = "itemid")
 ```
 
+**Rename the merged_df to final_df**
+
+```{r}
+final_df <- merged_df
+```
+
+```{r}
+# Rename column 'property' to 'categoryid'
+final_df <- final_df %>% rename(categoryid = property)
+```
+
 **Remove rows where categoryid is "available"**
 
 ```{r}
 # Remove rows where categoryid is "available"
 final_df <- final_df %>% 
   filter(categoryid != "available")
+```
+
+**Handling missing values in the final_df to final_dt**
+
+```{r}
+# Convert final_df to a data.table
+final_dt <- as.data.table(final_df)
+
+# Replace missing values in 'available' with 0
+final_dt[, available := ifelse(is.na(available), 0, available)]
+
+# Replace missing values in 'parentid' with -1
+final_dt[, parentid := ifelse(is.na(parentid), -1, parentid)]
+
+# Verify that the replacements worked by printing the count of NA's in each column
+print(colSums(is.na(final_dt)))
 ```
 
 **How does the availability of items impact user interactions?**
@@ -994,8 +1042,6 @@ ggplot(bin_summary, aes(x = duration_bin, y = avg_conversion_rate, fill = durati
     y = "Average Conversion Rate"
   ) +
   theme_minimal()
-
-
 ```
 
 **What is the distribution of event types across all users?**
@@ -1022,5 +1068,104 @@ ggplot(event_distribution, aes(x = event, y = proportion, fill = event)) +
        x = "Event Type",
        y = "Proportion of Events") +
   theme_minimal()
+```
+
+# Modelling
+
+## Task
+
+When a customer comes to an e-commerce site, he looks for a product with particular properties: price range, vendor, product type and etc. These properties are implicit, so it's hard to determine them through clicks log. Try to create an algorithm which predicts properties of items in "addtocart" event by using data from "view" events for any visitor in the published log.
+
+Remove Na's in the final_df for memory optimisation
+
+```{r}
+
+# Check NA's in columns
+colSums(is.na(final_df))
+
+
+# Remove NA's in parentid and available
+final_df_clean <- final_df[!is.na(final_df$parentid)]
+
+final_df_clean <- final_df[!is.na(final_df$available)]
+
+# Verify changes
+colSums(is.na(final_df_clean))
+```
+
+```{r}
+library(randomForest)
+library(dplyr)
+library(tidyr)
+
+# 1. Extract view events and add-to-cart events
+views_df <- final_df_clean %>% filter(event == "view")
+atc_df   <- final_df_clean %>% filter(event == "addtocart")
+
+# 2. Aggregate view events per visitor and category (without converting categoryid)
+view_features <- views_df %>%
+  group_by(visitorid, categoryid) %>%
+  summarise(views_count = n(), .groups = "drop") %>%
+  pivot_wider(names_from = categoryid, 
+              values_from = views_count, 
+              values_fill = list(views_count = 0))
+
+# Convert column names to syntactically valid names
+colnames(view_features) <- make.names(colnames(view_features))
+
+# 3. Merge the aggregated view features with add-to-cart events
+training_data <- atc_df %>% left_join(view_features, by = "visitorid")
+
+# 4. Prepare the training dataset:
+#    Set the target variable as the categoryid of the add-to-cart event and convert it to a factor.
+training_data <- training_data %>%
+  mutate(target = as.factor(as.character(categoryid)))
+
+# Select only the features from the aggregated view data and the target variable.
+feature_data <- training_data %>%
+  select(-timestamp, -itemid, -event, -transactionid, -parentid, -available, -categoryid)
+
+# Check frequency of each target level in feature_data
+target_counts <- table(feature_data$target)
+print(target_counts)
+
+# Define a threshold (e.g., only keep levels with more than 10 observations)
+levels_to_keep <- names(target_counts)[target_counts > 10]
+
+# Filter feature_data to keep only rows with target levels in levels_to_keep
+feature_data <- feature_data[feature_data$target %in% levels_to_keep, ]
+
+# Drop unused levels
+feature_data$target <- droplevels(feature_data$target)
+
+
+# Verify that there are no empty levels
+print(table(feature_data$target))
+
+# 5. Train a Random Forest classifier
+set.seed(42)
+rf_model <- randomForest(target ~ ., data = feature_data, na.action = na.omit)
+print(rf_model)
 
 ```
+
+The model output indicates that the random forest classifier was successfully trained in classification mode. It built 500 trees, and at each split, 32 variables were considered. The out-of-bag (OOB) error rate is 42.8 per cent. This means that, on average, the model misclassifies about 42.8 per cent of the observations that were not used in the training of each tree.
+
+An OOB error rate of 42.8 per cent is relatively high. This could be due to several factors such as high class imbalance, a large number of target classes, or limitations in the current set of features. It might be worthwhile to explore further feature engineering, hyperparameter tuning, or alternative modelling approaches to improve performance.
+
+Overall, the current model provides a baseline. Future steps may include refining the features, addressing class imbalance, and using cross-validation to better estimate model performance.
+
+**Confusion Matrix**
+
+```{r}
+library(caret)
+
+# Predict on the training set 
+predictions <- predict(rf_model, newdata = feature_data, na.action = na.omit)
+
+# Create a confusion matrix comparing predictions and true target values
+cm <- confusionMatrix(predictions, feature_data$target)
+print(cm)
+```
+
+The overall model performance was evaluated using the confusion matrix and several classification metrics. The model achieved an accuracy of 57.14 per cent with a 95 per cent confidence interval from 55.35 per cent to 58.91 per cent. The No Information Rate was 40.87 per cent, indicating that always predicting the majority class would yield around 40.87 per cent accuracy. A p-value below 2.2e-16 shows that the observed accuracy is significantly higher than this baseline. The Kappa statistic was 0.3203 which suggests a fair to moderate agreement beyond chance. Although McNemar's test was not applicable, these metrics together imply that the model performs moderately well but there remains significant room for improvement.
