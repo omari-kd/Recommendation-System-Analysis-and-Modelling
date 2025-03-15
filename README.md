@@ -580,7 +580,7 @@ A random forest classifier is used as a baseline model. This simple supervised c
 ## Evaluation
 The model output indicates that the random forest classifier was successfully trained in classification mode. It built 500 trees, and at each split, 32 variables were considered. The out-of-bag (OOB) error rate is 42.8 per cent. This means that, on average, the model misclassifies about 42.8 per cent of the observations that were not used in the training of each tree.
 
-An OOB error rate of 42.8 per cent is relatively high. This could be due to several factors such as high class imbalance, a large number of target classes, or limitations in the current set of features. It might be worthwhile to explore further feature engineering, hyperparameter tuning, or alternative modelling approaches to improve performance.
+An OOB error rate of 42.8 per cent is relatively high. This could be due to several factors such as high class imbalance, a large number of target classes or limitations in the current set of features. It might be worthwhile to explore further feature engineering, hyperparameter tuning, or alternative modelling approaches to improve performance.
 
 Overall, the current model provides a baseline. Future steps may include refining the features, addressing class imbalance, and using cross-validation to better estimate model performance.
 
