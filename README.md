@@ -210,14 +210,14 @@ A. View Events: The view event category has the highest count by significant mar
 
 B. Add to Cart Events: There are 68,966 events where visitors or users have added items to their cart. This is a positive sign as it indicates user interest in purchasing, although the number is much lower compared to the events.
 
-C. Transaction Events: This category has the lowest count with 22,457 events. This represents the number of completed transactions, which is a critical metric for revenue generation.
+C. Transaction Events: This category has the lowest count with 22,457 events. This represents the number of completed transactions, a critical metric for revenue generation.
 
 Analysis:
 
 The large number of view events compared to add to carts and transaction events suggest that there might be a drop-off in the conversion funnel (A conversion funnel, also known as a sales funnel or marketing funnel, is a visual representation of the customer journey from the first point of contact with a business to the final purchase or desired action. It's a model used to understand how potential customers move through different stages towards conversion, which is typically a sale but can also be any other desired action like signing up for a newsletter, downloading a whitepaper, purchasing product, et.) 
 Users are viewing content but not as many are proceeding to add items to cart or complete transactions.
 
-The ratio of view to transaction events is quite high. This could indicate that there are barriers to conversion, such as high prices, a poor user experience or lack of trust in the platform.
+The ratio of view to transaction events is quite high. This could indicate barriers to conversion, such as high prices, a poor user experience or lack of trust in the platform.
 
 The add to cart events are significantly higher than transactions, which is expected, but the gap is quite large. This could mean that users are adding items to their carts but not completing the purchase. Reasons could include abandoned carts, issues during the checkout process, or the user deciding against the purchase at the last moment.
 
@@ -352,13 +352,13 @@ The chart shows monthly total events from May through September, with the y-axis
 #### Key Observations
 
 #### Overall Range:
-This time series visualization reveals several vital patterns in user activity over time. Monthly events fluctuate significantly, ranging from 1000 to 22,000 events per day. This substantial variation suggests user activity is influenced by multiple daily changes.
+This time series visualization reveals several vital patterns in user activity over time. Monthly events fluctuate significantly, ranging from 1000 to 22,000 events. This substantial variation suggests user activity is influenced by monthly changes.
 
 #### Trend Analysis: 
 The latter part of the series (August-September) shows more pronounced fluctuations compared to earlier months. The final data point shows a significant drop to around 1000 events, which might indicate a recent change in user behavior or potential data collection issues.
 
 #### Potential Outliers: 
-Several days show unusually high spikes (over 20,000 events) that stand out from the general pattern. These could represent special events, marketing campaigns or system anomalies.
+The later part of July shows unusually high spikes (over 20,000 events) that stand out from the general pattern. These could represent special events, marketing campaigns or system anomalies.
 
 ### Implications:
 #### Recent Drop Investigation: 
