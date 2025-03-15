@@ -585,8 +585,7 @@ An OOB error rate of 42.8 per cent is relatively high. This could be due to seve
 Overall, the current model provides a baseline. Future steps may include refining the features, addressing class imbalance, and using cross-validation to better estimate model performance.
 
 #### Confusion Matrix
-The overall model performance was evaluated using the confusion matrix and several classification metrics. The model achieved an accuracy of 57.14 per cent with a 95 per cent confidence interval from 55.35 per cent to 58.91 per cent. The No Information Rate was 40.87 per cent, indicating that always predicting the majority class would yield around 40.87 per cent accuracy. A p-value below 2.2e-16 shows that the observed accuracy is significantly higher than this baseline. The Kappa statistic was 0.3203, which suggests a fair to moderate agreement beyond chance. These metrics together imply that the model performs moderately well, but there remains significant room for improvement.
-
+The overall model performance was evaluated using the confusion matrix and several classification metrics. The model achieved an accuracy of 57.14 per cent with a 95 per cent confidence interval from 55.35 per cent to 58.91 per cent. The No Information Rate was 40.87 per cent, indicating that always predicting the majority class would yield around 40.87 per cent accuracy. A p-value below 2.2e-16 shows that the observed accuracy is significantly higher than this baseline. The Kappa statistic was 0.3203 which suggests a fair to moderate agreement beyond chance. Although McNemar's test was not applicable, these metrics together imply that the model performs moderately well but there remains significant room for improvement.
 
 ## Recommendations 
 ### The top purchased products and viewed products recommendation
