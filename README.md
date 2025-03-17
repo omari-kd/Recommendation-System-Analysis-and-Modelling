@@ -678,3 +678,21 @@ Analyse Event Types: Identify if certain activities peak at different times than
 - Create segmented marketing messages based on user behavior
 - Conduct surveys or user testing to identify pain points
 - Test different user interface designs
+
+# Technologies used 
+- RStudio:Data Cleaning, Data analysis and visualisation
+- R (data.table, dplyr, tidyr, ggplot2, caret, reshape2, scales, isotree, matrix)
+- Machine Learning (randomForest, content-based method)
+- Git: Version control
+
+# Links (Journalling) 
+https://medium.com/@omarieben7/my-first-foray-into-recommendation-systems-8d2a8bd35b6b 
+https://medium.com/@omarieben7/a-comprehensive-data-preparation-journey-laying-the-foundation-for-effective-recommendations-71f40bbcfd45  
+https://medium.com/@omarieben7/my-third-foray-into-predicting-item-properties-using-user-views-26020ec152c8
+
+# Credit 
+Thanks to Azubi Africa for providing this data.
+
+
+
+
