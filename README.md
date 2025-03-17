@@ -685,6 +685,9 @@ Analyse Event Types: Identify if certain activities peak at different times than
 - Machine Learning (randomForest, content-based method)
 - Git: Version control
 
+# Contribution 
+Contributions are welcome! Submit issues or pull requests.
+
 # Links (Journalling) 
 https://medium.com/@omarieben7/my-first-foray-into-recommendation-systems-8d2a8bd35b6b 
 https://medium.com/@omarieben7/a-comprehensive-data-preparation-journey-laying-the-foundation-for-effective-recommendations-71f40bbcfd45  
