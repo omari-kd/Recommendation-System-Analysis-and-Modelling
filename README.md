@@ -191,10 +191,10 @@ b. Restructuring the Data:
 The filtered data was pivoted so that each item had its available status as a separate column. This step converts the long format into a wide format for the "available" property.
 
 c. Converting to Numeric and Integer:
-The available column was converted to numeric, with missing values replaced by 0, and then converted to integer (0 or 1).
+The available column was converted to numeric, with missing values replaced by 0and then converted to integer (0 or 1).
 
 d. Retaining Only the Latest Available Status:
-To avoid multiple records per item, the dataset was grouped by itemid, sorted in descending order by timestamp, and only the most recent available status was retained.
+To avoid multiple records per item, the dataset was grouped by itemid, sorted in descending order by timestampand only the most recent available status was retained.
 
 e. Final Merge:
 The processed availability data was then merged back into the merged_df to form a final_df via a left join on itemid so that all records from the main dataset were retained and enriched with the latest availability information. The property column was renamed to categoryid and rows containing "available" were removed since the available column had already been created.
@@ -219,7 +219,7 @@ Users are viewing content but not as many are proceeding to add items to cart or
 
 The ratio of view to transaction events is quite high. This could indicate barriers to conversion, such as high prices, a poor user experience or lack of trust in the platform.
 
-The add to cart events are significantly higher than transactions, which is expected, but the gap is quite large. This could mean that users are adding items to their carts but not completing the purchase. Reasons could include abandoned carts, issues during the checkout process, or the user deciding against the purchase at the last moment.
+The add to cart events are significantly higher than transactions, which is expected, but the gap is quite large. This could mean that users are adding items to their carts but not completing the purchase. Reasons could include abandoned carts, issues during the checkout processor the user deciding against the purchase at the last moment.
 
 ##### User Event Distribution Visualisation After Anomaly Removal
 ![image](https://github.com/user-attachments/assets/34fac08a-6bdf-4511-8f39-8c736bc6ccf2)
@@ -266,7 +266,7 @@ The large drop in views suggests that the website's traffic was significantly in
 
 The drop in addtocart events indicates that user engagement might be lower than initially thought, suggesting a need to improve the user experience or product offerings.
 
-The 75.9% reduction means that bots contributed heavily to transaction counts, but the remaining transactions after bot removal are likely more reliable as genuine human activity. This makes transactions a more trustworthy metric for evaluating real user behaviour, even though the absolute drop was large.
+The 75.9% reduction means that bots contributed heavily to transaction counts, but the remaining transactions after bot removal are likely more reliable as a genuine human activity. This makes transactions a more trustworthy metric for evaluating real user behaviour, even though the absolute drop was large.
 
 
 
@@ -319,7 +319,7 @@ Bot Flagged Users:
 ![image](https://github.com/user-attachments/assets/1ebd6369-f20d-4432-bce4-9e09180f6c87)
 
 
-The bar chart illustrates the user journey from viewing content to completing a transaction, revealing critical insights about user engagement and conversion rates. The x-axis represents the event types: view, addtocart and transaction. The y-axis represents the count of each event type. The bars are plotted in a way that shows a significant drop-off from views to addtocart, and then again from addtocart to transaction.
+The bar chart illustrates the user journey from viewing content to completing a transaction, revealing critical insights about user engagement and conversion rates. The x-axis represents the event types: view, addtocart and transaction. The y-axis represents the count of each event type. The bars are plotted in a way that shows a significant drop-off from views to addtocartand then again from addtocart to transaction.
 
 #### View dominance:
 The "view" event has an extremely high count, indicating substantial initial interest or traffic. This suggests effective marketing in driving users to the platform or content.
@@ -580,11 +580,11 @@ A random forest classifier is used as a baseline model. This simple supervised c
 
 
 ## Evaluation
-The model output indicates that the random forest classifier was successfully trained in classification mode. It built 500 trees, and at each split, 32 variables were considered. The out-of-bag (OOB) error rate is 42.8 per cent. This means that, on average, the model misclassifies about 42.8 per cent of the observations that were not used in the training of each tree.
+The model output indicates that the random forest classifier was successfully trained in classification mode. It built 500 treesand at each split, 32 variables were considered. The out-of-bag (OOB) error rate is 42.8 per cent. This means that, on average, the model misclassifies about 42.8 per cent of the observations that were not used in the training of each tree.
 
-An OOB error rate of 42.8 per cent is relatively high. This could be due to several factors such as high class imbalance, a large number of target classes or limitations in the current set of features. It might be worthwhile to explore further feature engineering, hyperparameter tuning, or alternative modelling approaches to improve performance.
+An OOB error rate of 42.8 per cent is relatively high. This could be due to several factors such as high class imbalance, a large number of target classes or limitations in the current set of features. It might be worthwhile to explore further feature engineering, hyperparameter tuningor alternative modelling approaches to improve performance.
 
-Overall, the current model provides a baseline. Future steps may include refining the features, addressing class imbalance, and using cross-validation to better estimate model performance.
+Overall, the current model provides a baseline. Future steps may include refining the features, addressing class imbalanceand using cross-validation to better estimate model performance.
 
 #### Confusion Matrix
 The overall model performance was evaluated using the confusion matrix and several classification metrics. The model achieved an accuracy of 57.14 per cent with a 95 per cent confidence interval from 55.35 per cent to 58.91 per cent. The No Information Rate was 40.87 per cent, indicating that always predicting the majority class would yield around 40.87 per cent accuracy. A p-value below 2.2e-16 shows that the observed accuracy is significantly higher than this baseline. The Kappa statistic was 0.3203 which suggests a fair to moderate agreement beyond chance. Although McNemar's test was not applicable, these metrics together imply that the model performs moderately well but there remains significant room for improvement.
