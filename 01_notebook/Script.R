@@ -1,4 +1,7 @@
 
+# This script contains the same code as the R Notebook 
+# For detailed explanations and analysis, refer to the notebook
+
 
 # ----------------------------
 # Load libraries
